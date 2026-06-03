@@ -197,7 +197,7 @@ function renderSidebar() {
 
     sidebar.innerHTML = `
         <div class="sidebar-logo">
-            <img src="Logo.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
+            <img src="Logo_small.png" alt="EduFlex" style="width:60px;height:60px;border-radius:8px;object-fit:contain">
             <span class="logo-text">EduFlex</span>
         </div>
         <ul class="nav-links">
@@ -231,7 +231,7 @@ function renderHeader() {
     if (APP.role === 'visitor') {
         header.innerHTML = `
             <div class="sidebar-logo" style="cursor:pointer" onclick="navigateTo('accueil')">
-                <img src="Logo.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
+                <img src="Logo_small.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
                 <span class="logo-text">EduFlex</span>
             </div>
             <div class="header-actions">
@@ -356,10 +356,8 @@ function renderLandingPage() {
                 </div>
             </div>
             <div class="hero-image-container">
-                <div class="hero-img-mock" style="height:320px;background:linear-gradient(135deg, #eff6ff 0%, #ecfdf5 50%, #fffbeb 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
-                    <img src="Logo.png" alt="EduFlex" style="width:160px;height:160px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(59,130,246,0.25))">
-                    <span style="font-weight:700;font-size:1.4rem;color:var(--color-primary)">EduFlex</span>
-                    <span style="color:var(--text-secondary);font-size:0.9rem">Plateforme éducative hybride</span>
+                <div class="hero-img-mock" style="height:350px;background:linear-gradient(135deg, #eff6ff 0%, #ecfdf5 50%, #fffbeb 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+                    <img src="Logo.png" alt="EduFlex" style="width:250px;height:250px;border-radius:15px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(59,130,246,0.25))">
                 </div>
                 <div class="hero-stats-badge">
                     <div class="hero-stats-num">97%</div>
@@ -667,22 +665,158 @@ function setMood(index) {
 }
 
 // ─── PAGE: COURS ─────────────────────────────────────────────────────────────
+const COURSES_DATA = {
+    'Mathématiques': {
+        videoUrl: 'https://www.youtube.com/embed/n5_pRx4ozIg?start=7',
+        videoTitle: 'Cours en cours : Fonctions affines',
+        fiches: [
+            { id: 'math-affines-cours', title: 'Synthèse : Les Fonctions Affines', type: 'Cours', size: '1.2 Mo', desc: 'Définition, représentation graphique, détermination du coefficient directeur.', contentHtml: '<h3>Les Fonctions Affines</h3><p>Une fonction affine est une fonction de la forme <strong>f(x) = ax + b</strong>.</p><ul><li><strong>a</strong> est le coefficient directeur (la pente de la droite).</li><li><strong>b</strong> est l\'ordonnée à l\'origine (l\'endroit où la droite coupe l\'axe vertical).</li></ul><h4>Exemple</h4><p>Soit <em>f(x) = 2x - 3</em>. Le coefficient directeur est 2 (la droite monte), et l\'ordonnée à l\'origine est -3.</p>' },
+            { id: 'math-affines-exo', title: 'Exercices corrigés : Équations & Tracés', type: 'Exercices', size: '950 Ko', desc: '10 exercices de difficulté progressive avec corrections détaillées.', contentHtml: '<h3>Exercices corrigés : Équations & Tracés</h3><p><strong>Exercice 1 :</strong> Déterminer l\'équation de la droite passant par A(1, 2) et B(3, 8).</p><p><em>Correction :</em><br>Le coefficient directeur <em>a = (yB - yA) / (xB - xA) = (8 - 2) / (3 - 1) = 6 / 2 = 3</em>.<br>L\'équation est de la forme <em>y = 3x + b</em>. Comme A(1, 2) appartient à la droite, on a : <em>2 = 3(1) + b => b = -1</em>.<br>L\'équation de la droite est donc <strong>y = 3x - 1</strong>.</p>' },
+            { id: 'math-analytique-memo', title: 'Formulaire de Géométrie analytique', type: 'Mémo', size: '450 Ko', desc: 'Toutes les formules essentielles sur les coordonnées et vecteurs.', contentHtml: '<h3>Formulaire de Géométrie analytique</h3><p>Dans un repère orthonormé (O, I, J) :</p><ul><li><strong>Distance entre deux points :</strong> d = √((xB - xA)² + (yB - yA)²)</li><li><strong>Coordonnées du milieu :</strong> M((xA + xB)/2 ; (yA + yB)/2)</li><li><strong>Coordonnées d\'un vecteur AB :</strong> AB(xB - xA ; yB - yA)</li></ul>' }
+        ],
+        quiz: [
+            {
+                question: 'Quelle est la forme générale d\'une fonction affine ?',
+                options: ['f(x) = ax²+b', 'f(x) = ax+b', 'f(x) = a/x', 'f(x) = √x'],
+                correct: 1,
+                explanation: 'Une fonction affine est représentée par une droite. Sa formule est de la forme f(x) = ax + b, où "a" représente le coefficient directeur et "b" l\'ordonnée à l\'origine. f(x) = ax²+b est une fonction du second degré, f(x) = a/x est une fonction inverse et f(x) = √x est la fonction racine carrée.'
+            },
+            {
+                question: 'Quel est le coefficient directeur de f(x) = 3x - 7 ?',
+                options: ['7', '-7', '3', '-3'],
+                correct: 2,
+                explanation: 'Dans l\'expression ax + b, le coefficient directeur est le nombre "a" qui multiplie x. Ici, c\'est 3. Le nombre -7 correspond à l\'ordonnée à l\'origine "b".'
+            },
+            {
+                question: 'L\'ordonnée à l\'origine de f(x) = 2x + 5 est :',
+                options: ['2', '5', '7', '0'],
+                correct: 1,
+                explanation: 'L\'ordonnée à l\'origine est la valeur de f(0), c\'est-à-dire la constante "b" dans ax + b. Pour f(x) = 2x + 5, c\'est 5. C\'est le point où la droite coupe l\'axe des ordonnées (y).'
+            }
+        ]
+    },
+    'Français': {
+        videoUrl: 'https://www.youtube.com/embed/0T26wN8yJ7g',
+        videoTitle: 'Cours en cours : Les figures de style',
+        fiches: [
+            { id: 'fr-style-cours', title: 'Les Figures de Style incontournables', type: 'Cours', size: '1.5 Mo', desc: 'Métaphores, comparaisons, personnifications et oxymores illustrés.', contentHtml: '<h3>Les Figures de Style</h3><p>Les figures de style enrichissent un texte et lui donnent une force expressive.</p><ul><li><strong>La Comparaison :</strong> Rapprochement de deux éléments à l\'aide d\'un outil de comparaison (comme, tel, semblable à). <em>Exemple : Il est fort comme un lion.</em></li><li><strong>La Métaphore :</strong> Comparaison sans mot de liaison. <em>Exemple : Cet homme est un lion.</em></li><li><strong>L\'Oxymore :</strong> Alliance de deux mots de sens opposés. <em>Exemple : Une obscure clarté.</em></li></ul>' },
+            { id: 'fr-commentaire-methode', title: 'Fiche Méthode : Le Commentaire Littéraire', type: 'Méthodologie', size: '850 Ko', desc: 'Structure du plan, introduction, développement et conclusion type.', contentHtml: '<h3>Fiche Méthode : Le Commentaire Littéraire</h3><p>Le commentaire de texte réclame rigueur et logique :</p><ol><li><strong>L\'Introduction :</strong> Présentation de l\'auteur, de l\'œuvre, situation du passage, problématique et annonce du plan.</li><li><strong>Le Développement :</strong> Deux ou trois grandes parties structurées en sous-parties avec citations analysées.</li><li><strong>La Conclusion :</strong> Bilan des axes principaux et ouverture vers un autre texte ou auteur.</li></ol>' }
+        ],
+        quiz: [
+            {
+                question: 'Quelle figure de style est utilisée dans "Cette obscure clarté qui tombe des étoiles" ?',
+                options: ['Une métaphore', 'Un oxymore', 'Une comparaison', 'Une hyperbole'],
+                correct: 1,
+                explanation: 'Un oxymore réunit deux termes de sens opposés dans un même groupe de mots ("obscure clarté"). La métaphore est une comparaison sans outil de comparaison, la comparaison utilise un outil, et l\'hyperbole est une exagération.'
+            },
+            {
+                question: 'Qu\'est-ce qu\'une comparaison ?',
+                options: ['Rapprocher deux termes avec un outil de comparaison', 'Rapprocher deux termes sans outil de comparaison', 'Exagérer une réalité', 'Attribuer des traits humains à un objet ou animal'],
+                correct: 0,
+                explanation: 'La comparaison utilise un mot outil (comme, semblable à, tel que). Rapprocher deux termes sans outil est une métaphore, exagérer est une hyperbole et attribuer des traits humains est une personnification.'
+            }
+        ]
+    },
+    'Histoire-Géo': {
+        videoUrl: 'https://www.youtube.com/embed/3Lr6G12sR64',
+        videoTitle: 'Cours en cours : La Première Guerre Mondiale',
+        fiches: [
+            { id: 'hg-ww1-cours', title: 'Synthèse : La Première Guerre Mondiale (1914-1918)', type: 'Cours', size: '2.1 Mo', desc: 'Les grandes phases du conflit, la vie dans les tranchées et le bilan humain.', contentHtml: '<h3>La Première Guerre Mondiale (1914-1918)</h3><p>Un conflit total qui a bouleversé l\'Europe :</p><ul><li><strong>1914 :</strong> Entrée en guerre suite à l\'assentiment de François-Ferdinand à Sarajevo. Guerre de mouvement.</li><li><strong>1915-1917 :</strong> Guerre de position (tranchées). Conditions de vie effroyables des Poilus (Verdun, la Somme).</li><li><strong>1918 :</strong> Reprise de la guerre de mouvement et signature de l\'Armistice le 11 novembre.</li></ul>' },
+            { id: 'hg-mondialisation-carte', title: 'Cartographie : La mondialisation en fonctionnement', type: 'Cartes', size: '3.4 Mo', desc: 'Cartes clés des flux mondiaux, des métropoles et des espaces maritimes.', contentHtml: '<h3>Cartographie : La mondialisation</h3><p>La mondialisation repose sur des flux et des centres d\'impulsion majeurs :</p><ul><li><strong>Les flux matériels :</strong> Marchandises maritimes transitant par les grands canaux (Suez, Panama).</li><li><strong>Les flux immatériels :</strong> Capitaux financiers et informations numériques instantanées.</li><li><strong>Les pôles majeurs :</strong> Les trois mégapoles mondiales (Américaine, Européenne, Asiatique).</li></ul>' }
+        ],
+        quiz: [
+            {
+                question: 'En quelle année a débuté la Première Guerre Mondiale ?',
+                options: ['1912', '1914', '1916', '1918'],
+                correct: 1,
+                explanation: 'La Première Guerre Mondiale a débuté en août 1914 suite à l\'assassinat de l\'archiduc François-Ferdinand en juin 1914 et à la mobilisation des alliances.'
+            },
+            {
+                question: 'Quel traité met fin officiellement à la Première Guerre Mondiale en 1919 ?',
+                options: ['Le traité de Rome', 'Le traité de Versailles', 'Le traité d\'Utrecht', 'Le traité de Paris'],
+                correct: 1,
+                explanation: 'Le traité de Versailles, signé le 28 juin 1919 dans la galerie des Glaces, règle la paix et attribue la responsabilité de la guerre à l\'Allemagne.'
+            }
+        ]
+    },
+    'SVT': {
+        videoUrl: 'https://www.youtube.com/embed/Q4X-3W7W1wQ',
+        videoTitle: 'Cours en cours : La mitose et réplication de l\'ADN',
+        fiches: [
+            { id: 'svt-adn-cours', title: 'La Mitose & Réplication de l\'ADN', type: 'Cours', size: '1.9 Mo', desc: 'Représentation visuelle des étapes de division cellulaire et réplication.', contentHtml: '<h3>La Réplication de l\'ADN</h3><p>L\'ADN se réplique de manière semi-conservative :</p><ul><li>Les deux brins de la double hélice se séparent.</li><li>De nouveaux nucléotides complémentaires sont assemblés en face de chaque brin modèle.</li><li>On obtient deux molécules d\'ADN identiques à la molécule de départ.</li></ul>' },
+            { id: 'svt-lexique-genetique', title: 'Le vocabulaire de la génétique', type: 'Lexique', size: '1.1 Mo', desc: 'Définitions essentielles : Allèle, Gène, Génome, Phénotype et Génotype.', contentHtml: '<h3>Lexique de Génétique</h3><ul><li><strong>Gène :</strong> Portion d\'ADN codant pour un caractère précis.</li><li><strong>Allèle :</strong> Version différente d\'un même gène (ex: allèle yeux bleus / yeux marrons).</li><li><strong>Génotype :</strong> Ensemble des allèles d\'un individu.</li><li><strong>Phénotype :</strong> Ensemble des caractères observables d\'un individu.</li></ul>' }
+        ],
+        quiz: [
+            {
+                question: 'Quelle molécule porte l\'information génétique ?',
+                options: ['L\'ARN', 'L\'ADN', 'Une protéine', 'Le glucose'],
+                correct: 1,
+                explanation: 'L\'ADN (Acide Désoxyribonucléique) est le support universel de l\'information génétique chez la majorité des êtres vivants.'
+            }
+        ]
+    },
+    'Anglais': {
+        videoUrl: 'https://www.youtube.com/embed/l59B6d7wOeo',
+        videoTitle: 'Cours en cours : Les temps du passé',
+        fiches: [
+            { id: 'ang-verbs-memo', title: 'Mémo : Les Verbes Irréguliers', type: 'Mémo', size: '600 Ko', desc: 'Tableau complet classé par phonétique des 100 verbes les plus courants.', contentHtml: '<h3>Les Verbes Irréguliers essentiels</h3><table><thead><tr><th>Base Verbale</th><th>Prétérit</th><th>Participe Passé</th><th>Traduction</th></tr></thead><tbody><tr><td>Be</td><td>was/were</td><td>been</td><td>être</td></tr><tr><td>Go</td><td>went</td><td>gone</td><td>aller</td></tr><tr><td>Do</td><td>did</td><td>done</td><td>faire</td></tr><tr><td>Take</td><td>took</td><td>taken</td><td>prendre</td></tr></tbody></table>' },
+            { id: 'ang-opinion-vocab', title: 'Vocabulaire thématique : Exprimer son opinion', type: 'Vocabulaire', size: '420 Ko', desc: 'Mots de liaison et tournures idiomatiques pour argumenter.', contentHtml: '<h3>Exprimer son opinion en anglais</h3><ul><li><strong>In my opinion / To my mind :</strong> À mon avis</li><li><strong>I strongly believe that... :</strong> Je crois fermement que...</li><li><strong>On the one hand... on the other hand... :</strong> D\'un côté... de l\'autre...</li><li><strong>To sum up / In conclusion :</strong> En conclusion</li></ul>' }
+        ],
+        quiz: [
+            {
+                question: 'Quel est le prétérit du verbe "to go" ?',
+                options: ['goed', 'gone', 'went', 'goes'],
+                correct: 2,
+                explanation: 'Le verbe "to go" est irrégulier : go / went / gone. Le prétérit simple est donc "went".'
+            }
+        ]
+    },
+    'Physique-Chimie': {
+        videoUrl: 'https://www.youtube.com/embed/V6W_W1p4GVE',
+        videoTitle: 'Cours en cours : Structure de l\'atome',
+        fiches: [
+            { id: 'pc-atome-memo', title: 'Le Tableau Périodique des Éléments', type: 'Mémo', size: '1.4 Mo', desc: 'Familles chimiques et propriétés fondamentales pour les atomes.', contentHtml: '<h3>Structure de l\'Atome</h3><p>Un atome est constitué :</p><ul><li>D\'un <strong>noyau</strong> central contenant des protons (chargés positivement) et des neutrons (neutres).</li><li>De <strong>nuages d\'électrons</strong> (chargés négativement) gravitant autour du noyau.</li></ul><p>L\'atome est électriquement neutre : il y a autant d\'électrons que de protons.</p>' }
+        ],
+        quiz: [
+            {
+                question: 'Quelle est la formule chimique de l\'eau ?',
+                options: ['CO2', 'NaCl', 'H2O', 'CH4'],
+                correct: 2,
+                explanation: 'La formule chimique de l\'eau est H2O (deux atomes d\'hydrogène pour un atome d\'oxygène). CO2 est le dioxyde de carbone, NaCl le sel de table, et CH4 le méthane.'
+            }
+        ]
+    }
+};
+
+let quizIndex = 0, quizScore = 0, quizAnswered = false;
+let activePreviewFiche = null;
+
 function renderCoursPage() {
+    APP.activeSubject = APP.activeSubject || 'Mathématiques';
+    const subject = COURSES_DATA[APP.activeSubject] || COURSES_DATA['Mathématiques'];
+
+    const subjects = [
+        { icon: 'calculator', name: 'Mathématiques', progress: 72, lessons: 24, color: '#3b82f6' },
+        { icon: 'book-open', name: 'Français', progress: 58, lessons: 18, color: '#10b981' },
+        { icon: 'landmark', name: 'Histoire-Géo', progress: 85, lessons: 20, color: '#f59e0b' },
+        { icon: 'flask-conical', name: 'SVT', progress: 40, lessons: 16, color: '#8b5cf6' },
+        { icon: 'globe', name: 'Anglais', progress: 63, lessons: 22, color: '#ec4899' },
+        { icon: 'atom', name: 'Physique-Chimie', progress: 35, lessons: 14, color: '#14b8a6' }
+    ];
+
     return `
     <div class="fade-in-up">
         <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Mes Cours</h1>
-        <p style="color:var(--text-secondary);margin-bottom:32px">Explore tes matières et continue ta progression.</p>
+        <p style="color:var(--text-secondary);margin-bottom:32px">Explore tes matières, consulte tes fiches et continue ta progression.</p>
 
-        <div class="course-subjects-grid">
-            ${[
-            { icon: 'calculator', name: 'Mathématiques', progress: 72, lessons: 24, color: '#3b82f6' },
-            { icon: 'book-open', name: 'Français', progress: 58, lessons: 18, color: '#10b981' },
-            { icon: 'landmark', name: 'Histoire-Géo', progress: 85, lessons: 20, color: '#f59e0b' },
-            { icon: 'flask-conical', name: 'SVT', progress: 40, lessons: 16, color: '#8b5cf6' },
-            { icon: 'globe', name: 'Anglais', progress: 63, lessons: 22, color: '#ec4899' },
-            { icon: 'atom', name: 'Physique-Chimie', progress: 35, lessons: 14, color: '#14b8a6' }
-        ].map(s => `
-                <div class="subject-card" onclick="showToast('Ouverture du cours de ${s.name}...', 'primary')">
+        <!-- Subjects Grid -->
+        <div class="course-subjects-grid" style="margin-bottom: 40px">
+            ${subjects.map(s => {
+        const isActive = APP.activeSubject === s.name;
+        return `
+                <div class="subject-card ${isActive ? 'active' : ''}" 
+                     style="cursor:pointer; transition: transform 0.2s, box-shadow 0.2s; border: 2px solid ${isActive ? s.color : 'transparent'}; box-shadow: ${isActive ? '0 10px 20px -5px ' + s.color + '30' : ''}"
+                     onclick="selectSubject('${s.name}')">
                     <div class="subject-header-icon" style="background:${s.color}15;color:${s.color}">
                         <i data-lucide="${s.icon}" style="width:24px;height:24px"></i>
                     </div>
@@ -693,72 +827,130 @@ function renderCoursPage() {
                     </div>
                     <div class="progress-container"><div class="progress-fill" style="width:${s.progress}%;background:${s.color}"></div></div>
                 </div>
-            `).join('')}
+                `;
+    }).join('')}
         </div>
 
-        <!-- Video Player - Fonctions affines -->
+        <div style="border-bottom: 2px solid var(--border-color); margin-bottom: 40px;"></div>
+
+        <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:24px;display:flex;align-items:center;gap:12px">
+            <span style="display:inline-block;width:12px;height:24px;border-radius:4px;background:var(--color-primary)"></span>
+            Matière active : ${APP.activeSubject}
+        </h2>
+
+        <!-- Fiches & Ressources Section -->
         <div class="card" style="margin-bottom:32px">
-            <div class="card-title"><i data-lucide="play-circle" style="width:20px;height:20px;color:var(--color-primary)"></i> Cours en cours : Fonctions affines</div>
+            <div class="card-title"><i data-lucide="files" style="width:20px;height:20px;color:var(--color-primary)"></i> Fiches de cours & révision</div>
+            <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px">Retrouve tes synthèses de cours, tes fiches méthodes et tes mémos indispensables.</p>
+            <div style="display:grid;grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));gap:16px">
+                ${subject.fiches.map(f => `
+                    <div class="card card-premium" style="display:flex;flex-direction:column;justify-content:space-between;padding:20px;border:1px solid var(--border-color)">
+                        <div>
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+                                <span class="badge" style="background:var(--color-primary-light);color:var(--color-primary);font-size:0.75rem;padding:4px 8px;border-radius:6px;font-weight:600">${f.type}</span>
+                                <span style="font-size:0.75rem;color:var(--text-secondary)">${f.size}</span>
+                            </div>
+                            <h4 style="font-size:1rem;font-weight:700;margin-bottom:8px;line-height:1.4">${f.title}</h4>
+                            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:16px;line-height:1.5">${f.desc}</p>
+                        </div>
+                        <div style="display:flex;gap:10px">
+                            <button class="btn btn-secondary btn-sm" style="flex:1" onclick="previewFiche('${f.id}')"><i data-lucide="eye" style="width:14px;height:14px"></i> Lire</button>
+                            <button class="btn btn-primary btn-sm" onclick="showToast('Téléchargement de la fiche démarré...', 'success')"><i data-lucide="download" style="width:14px;height:14px"></i> PDF</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <!-- Video Player -->
+        <div class="card" style="margin-bottom:32px">
+            <div class="card-title"><i data-lucide="play-circle" style="width:20px;height:20px;color:var(--color-primary)"></i> ${subject.videoTitle || 'Cours vidéo interactif'}</div>
             <div style="position:relative;width:100%;padding-top:56.25%;border-radius:12px;overflow:hidden;background:#000">
                 <iframe
-                    src="https://www.youtube.com/embed/n5_pRx4ozIg?start=7"
+                    src="${subject.videoUrl}"
                     style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerpolicy="strict-origin-when-cross-origin"
                     allowfullscreen
-                    title="Cours Fonctions affines"
+                    title="${subject.videoTitle}"
                 ></iframe>
             </div>
         </div>
 
         <!-- Quiz Section -->
-        <div class="card">
-            <div class="card-title"><i data-lucide="help-circle" style="width:20px;height:20px;color:var(--color-success)"></i> Quiz : Fonctions affines</div>
+        <div class="card" style="margin-bottom:40px">
+            <div class="card-title"><i data-lucide="help-circle" style="width:20px;height:20px;color:var(--color-success)"></i> Quiz d'évaluation</div>
             <div class="quiz-container-box" id="quiz-area">
                 ${renderQuiz()}
             </div>
         </div>
     </div>
+
+    <!-- Fiche Preview Overlay Modal -->
+    ${activePreviewFiche ? `
+    <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px" onclick="closeFichePreview()">
+        <div class="card fade-in" style="width:100%;max-width:700px;max-height:85vh;overflow-y:auto;position:relative;padding:32px;box-shadow:var(--shadow-lg)" onclick="event.stopPropagation()">
+            <button class="icon-btn" style="position:absolute;top:20px;right:20px" onclick="closeFichePreview()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+            <div style="margin-bottom:20px">
+                <span class="badge" style="background:var(--color-primary-light);color:var(--color-primary);margin-bottom:8px">${activePreviewFiche.type}</span>
+                <h2 style="font-size:1.4rem;font-weight:800;margin-bottom:8px">${activePreviewFiche.title}</h2>
+                <div style="border-bottom:1px solid var(--border-color);margin-top:16px"></div>
+            </div>
+            <div class="fiche-modal-body" style="font-size:0.95rem;line-height:1.6;color:var(--text-primary)">
+                ${activePreviewFiche.contentHtml}
+            </div>
+            <div style="margin-top:32px;display:flex;justify-content:flex-end;gap:12px">
+                <button class="btn btn-secondary" onclick="closeFichePreview()">Fermer</button>
+                <button class="btn btn-primary" onclick="showToast('Téléchargement démarré...', 'success'); closeFichePreview()"><i data-lucide="download" style="width:16px;height:16px"></i> Télécharger PDF</button>
+            </div>
+        </div>
+    </div>
+    ` : ''}
     `;
 }
 
-// ─── QUIZ ENGINE ─────────────────────────────────────────────────────────────
-const quizData = [
-    {
-        question: 'Quelle est la forme générale d\'une fonction affine ?',
-        options: ['f(x) = ax²+b', 'f(x) = ax+b', 'f(x) = a/x', 'f(x) = √x'],
-        correct: 1,
-        explanation: 'Une fonction affine est représentée par une droite. Sa formule est de la forme f(x) = ax + b, où "a" représente le coefficient directeur et "b" l\'ordonnée à l\'origine. f(x) = ax²+b est une fonction du second degré, f(x) = a/x est une fonction inverse et f(x) = √x est la fonction racine carrée.'
-    },
-    {
-        question: 'Quel est le coefficient directeur de f(x) = 3x - 7 ?',
-        options: ['7', '-7', '3', '-3'],
-        correct: 2,
-        explanation: 'Dans l\'expression ax + b, le coefficient directeur est le nombre "a" qui multiplie x. Ici, c\'est 3. Le nombre -7 correspond à l\'ordonnée à l\'origine "b".'
-    },
-    {
-        question: 'L\'ordonnée à l\'origine de f(x) = 2x + 5 est :',
-        options: ['2', '5', '7', '0'],
-        correct: 1,
-        explanation: 'L\'ordonnée à l\'origine est la valeur de f(0), c\'est-à-dire la constante "b" dans ax + b. Pour f(x) = 2x + 5, c\'est 5. C\'est le point où la droite coupe l\'axe des ordonnées (y).'
+function selectSubject(subjectName) {
+    APP.activeSubject = subjectName;
+    saveState();
+    quizIndex = 0;
+    quizScore = 0;
+    quizAnswered = false;
+    renderApp();
+}
+
+function previewFiche(ficheId) {
+    const subject = COURSES_DATA[APP.activeSubject] || COURSES_DATA['Mathématiques'];
+    const fiche = subject.fiches.find(f => f.id === ficheId);
+    if (fiche) {
+        activePreviewFiche = fiche;
+        renderApp();
     }
-];
-let quizIndex = 0, quizScore = 0, quizAnswered = false;
+}
+
+function closeFichePreview() {
+    activePreviewFiche = null;
+    renderApp();
+}
+
+const quizData = []; // Fallback for references, but functions will use dynamic evaluation
 
 function renderQuiz() {
-    if (quizIndex >= quizData.length) {
+    const currentSubject = APP.activeSubject || 'Mathématiques';
+    const activeQuizData = COURSES_DATA[currentSubject]?.quiz || [];
+
+    if (quizIndex >= activeQuizData.length) {
         return `
             <div style="text-align:center;padding:40px">
-                <div style="font-size:3rem;margin-bottom:16px">${quizScore === quizData.length ? '🏆' : quizScore >= 2 ? '🎉' : '💪'}</div>
+                <div style="font-size:3rem;margin-bottom:16px">${quizScore === activeQuizData.length ? '🏆' : quizScore >= 1 ? '🎉' : '💪'}</div>
                 <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:8px">Quiz terminé !</h3>
-                <p style="color:var(--text-secondary);margin-bottom:24px">Score : ${quizScore}/${quizData.length}</p>
+                <p style="color:var(--text-secondary);margin-bottom:24px">Score : ${quizScore}/${activeQuizData.length}</p>
                 <button class="btn btn-primary" onclick="resetQuiz()"><i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> Recommencer</button>
             </div>
         `;
     }
-    const q = quizData[quizIndex];
+    const q = activeQuizData[quizIndex];
     return `
-        <div class="quiz-question-counter">Question ${quizIndex + 1}/${quizData.length}</div>
+        <div class="quiz-question-counter">Question ${quizIndex + 1}/${activeQuizData.length}</div>
         <div class="quiz-question-text">${q.question}</div>
         <div class="quiz-options-list">
             ${q.options.map((opt, i) => `
@@ -777,7 +969,10 @@ function renderQuiz() {
 function answerQuiz(index) {
     if (quizAnswered) return;
     quizAnswered = true;
-    const q = quizData[quizIndex];
+
+    const currentSubject = APP.activeSubject || 'Mathématiques';
+    const activeQuizData = COURSES_DATA[currentSubject]?.quiz || [];
+    const q = activeQuizData[quizIndex];
     const correct = q.correct;
     const options = document.querySelectorAll('.quiz-option-item');
 
@@ -816,14 +1011,11 @@ function nextQuizQuestion() {
     if (quizArea) {
         quizArea.innerHTML = renderQuiz();
         lucide.createIcons({ nodes: [quizArea] });
-        if (quizIndex >= quizData.length && quizScore === quizData.length) launchConfetti();
-    }
-}
 
-function resetQuiz() {
-    quizIndex = 0; quizScore = 0; quizAnswered = false;
-    const quizArea = document.getElementById('quiz-area');
-    if (quizArea) { quizArea.innerHTML = renderQuiz(); lucide.createIcons({ nodes: [quizArea] }); }
+        const currentSubject = APP.activeSubject || 'Mathématiques';
+        const activeQuizData = COURSES_DATA[currentSubject]?.quiz || [];
+        if (quizIndex >= activeQuizData.length && quizScore === activeQuizData.length) launchConfetti();
+    }
 }
 
 // ─── PAGE: IA ASSISTANT ──────────────────────────────────────────────────────
@@ -913,17 +1105,17 @@ function renderLivePage() {
         // Utilisation de youtube-nocookie.com pour éviter les blocages de cookies d'intégration
         const embedUrl = "https://www.youtube-nocookie.com/embed/uV_EmbYu9_E?start=12&autoplay=1";
         playerHtml = `
-            <div class="card" style="margin-bottom: 32px; padding: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                    <div class="card-title" style="margin-bottom: 0;">
+            <div class="card" style="margin-bottom: 32px; padding: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+                    <div class="card-title" style="margin-bottom: 0; min-width: 200px; flex: 1;">
                         <i data-lucide="video" style="width:20px;height:20px;color:var(--color-danger);animation:pulseBorder 2s infinite"></i> 
-                        Cours en Direct : Résolution d'équations (Maths)
+                        Direct : Équations (Maths)
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <a href="https://youtu.be/uV_EmbYu9_E?si=RHe_zoPk6W13c3DU&t=12" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center;">
-                            <i data-lucide="external-link" style="width:14px;height:14px;margin-right:5px"></i> Ouvrir sur YouTube
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <a href="https://youtu.be/uV_EmbYu9_E?si=RHe_zoPk6W13c3DU&t=12" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; white-space: nowrap;">
+                            <i data-lucide="external-link" style="width:14px;height:14px;margin-right:5px"></i> YouTube
                         </a>
-                        <button class="btn btn-secondary btn-sm" onclick="closeLiveStream()">
+                        <button class="btn btn-secondary btn-sm" onclick="closeLiveStream()" style="white-space: nowrap;">
                             <i data-lucide="x" style="width:16px;height:16px"></i> Fermer
                         </button>
                     </div>
@@ -1462,11 +1654,11 @@ function renderParentSuivi() {
                 <div class="card-title"><i data-lucide="line-chart" style="width:20px;height:20px;color:var(--color-primary)"></i> Moyennes trimestrielles</div>
                 <div style="display:flex; flex-direction:column; gap:16px;">
                     ${[
-                        { subject: 'Mathématiques', avg: '16.5/20', desc: 'Excellente progression', color: 'blue' },
-                        { subject: 'Français', avg: '14.0/20', desc: 'Travail régulier et sérieux', color: 'green' },
-                        { subject: 'Histoire-Géo', avg: '17.5/20', desc: 'Élève très impliqué', color: 'orange' },
-                        { subject: 'SVT', avg: '12.0/20', desc: 'Des efforts à poursuivre', color: 'purple' }
-                    ].map(s => `
+            { subject: 'Mathématiques', avg: '16.5/20', desc: 'Excellente progression', color: 'blue' },
+            { subject: 'Français', avg: '14.0/20', desc: 'Travail régulier et sérieux', color: 'green' },
+            { subject: 'Histoire-Géo', avg: '17.5/20', desc: 'Élève très impliqué', color: 'orange' },
+            { subject: 'SVT', avg: '12.0/20', desc: 'Des efforts à poursuivre', color: 'purple' }
+        ].map(s => `
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div>
                                 <strong style="font-size:0.95rem;">${s.subject}</strong>
@@ -1578,9 +1770,9 @@ function renderParentFacturation() {
                 <div class="card-title"><i data-lucide="file-text" style="width:20px;height:20px;color:var(--color-success)"></i> Historique de Facturation</div>
                 <div style="display:flex; flex-direction:column; gap:10px;">
                     ${[
-                        { date: '15 Mai 2026', amount: '67.00 €', id: 'FACT-002' },
-                        { date: '15 Avril 2026', amount: '67.00 €', id: 'FACT-001' }
-                    ].map(f => `
+            { date: '15 Mai 2026', amount: '67.00 €', id: 'FACT-002' },
+            { date: '15 Avril 2026', amount: '67.00 €', id: 'FACT-001' }
+        ].map(f => `
                         <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid var(--border-color); border-radius: var(--border-radius-md);">
                             <div>
                                 <strong style="font-size:0.9rem;">${f.id}</strong>
@@ -1608,11 +1800,11 @@ function renderTeacherStudents() {
         
         <div class="teacher-inbox-preview" style="display:flex; flex-direction:column; gap:12px;">
             ${[
-                { name: 'Léa Martin', alert: 'Tout va bien', status: 'En ligne', mood: '😄', mathAvg: '16/20', lastActive: 'Il y a 5 min' },
-                { name: 'Lucas Moreau', alert: 'Alerte bien-être : stress élevé', status: 'Hors ligne', mood: '😟', mathAvg: '11/20', lastActive: 'Il y a 3 heures' },
-                { name: 'Thomas Dupont', alert: 'Tout va bien', status: 'En ligne', mood: '😐', mathAvg: '13/20', lastActive: 'Il y a 10 min' },
-                { name: 'Inès Boucher', alert: 'Tout va bien', status: 'En ligne', mood: '🙂', mathAvg: '15/20', lastActive: 'Il y a 2 min' }
-            ].map(s => `
+            { name: 'Léa Martin', alert: 'Tout va bien', status: 'En ligne', mood: '😄', mathAvg: '16/20', lastActive: 'Il y a 5 min' },
+            { name: 'Lucas Moreau', alert: 'Alerte bien-être : stress élevé', status: 'Hors ligne', mood: '😟', mathAvg: '11/20', lastActive: 'Il y a 3 heures' },
+            { name: 'Thomas Dupont', alert: 'Tout va bien', status: 'En ligne', mood: '😐', mathAvg: '13/20', lastActive: 'Il y a 10 min' },
+            { name: 'Inès Boucher', alert: 'Tout va bien', status: 'En ligne', mood: '🙂', mathAvg: '15/20', lastActive: 'Il y a 2 min' }
+        ].map(s => `
                 <div class="teacher-student-row" style="padding: 20px;">
                     <div style="display:flex; align-items:center; gap:16px; flex: 1.2;">
                         <div style="width:44px; height:44px; border-radius:50%; background:var(--color-primary-light); color:var(--color-primary); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1rem;">
@@ -1673,9 +1865,9 @@ function renderTeacherContenus() {
                 <div class="card-title"><i data-lucide="file-text" style="width:20px;height:20px;color:var(--color-success)"></i> Ressources publiées</div>
                 <div style="display:flex; flex-direction:column; gap:10px;">
                     ${[
-                        { title: 'Fonctions affines (Vidéo + Quiz)', subject: 'Mathématiques', status: 'Publié' },
-                        { title: 'Analyse du commentaire littéraire', subject: 'Français', status: 'Brouillon' }
-                    ].map(r => `
+            { title: 'Fonctions affines (Vidéo + Quiz)', subject: 'Mathématiques', status: 'Publié' },
+            { title: 'Analyse du commentaire littéraire', subject: 'Français', status: 'Brouillon' }
+        ].map(r => `
                         <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--border-color); border-radius: var(--border-radius-md);">
                             <div>
                                 <strong style="font-size:0.9rem;">${r.title}</strong>
@@ -1701,10 +1893,10 @@ function renderTeacherPlanning() {
             <div class="card-title"><i data-lucide="calendar" style="width:20px;height:20px;color:var(--color-primary)"></i> Mon Planning de la semaine</div>
             <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
                 ${[
-                    { date: 'Lundi - 10:30', title: 'Cours en Direct - Fonctions affines', type: 'live' },
-                    { date: 'Mardi - 14:00', title: 'Tutorat Individuel - Léa Martin', type: 'tutorat' },
-                    { date: 'Jeudi - 16:00', title: 'Réunion d\'équipe pédagogique', type: 'admin' }
-                ].map(p => `
+            { date: 'Lundi - 10:30', title: 'Cours en Direct - Fonctions affines', type: 'live' },
+            { date: 'Mardi - 14:00', title: 'Tutorat Individuel - Léa Martin', type: 'tutorat' },
+            { date: 'Jeudi - 16:00', title: 'Réunion d\'équipe pédagogique', type: 'admin' }
+        ].map(p => `
                     <div style="display:flex; align-items:center; justify-content:space-between; padding:14px; border:1px solid var(--border-color); border-radius: var(--border-radius-md);">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <span class="status-indicator ${p.type === 'live' ? 'status-danger' : p.type === 'tutorat' ? 'status-active' : 'status-pending'}"></span>
@@ -1733,9 +1925,9 @@ function renderAdminUsers() {
             <div class="card-title"><i data-lucide="users" style="width:20px;height:20px;color:var(--color-primary)"></i> En attente de validation</div>
             <div style="display:flex; flex-direction:column; gap:12px;">
                 ${[
-                    { name: 'Mme Durand', email: 'durand.tuteur@eduflex.fr', role: 'Enseignant' },
-                    { name: 'Arthur Dupuis', email: 'arthur.dupuis@gmail.com', role: 'Élève' }
-                ].map(u => `
+            { name: 'Mme Durand', email: 'durand.tuteur@eduflex.fr', role: 'Enseignant' },
+            { name: 'Arthur Dupuis', email: 'arthur.dupuis@gmail.com', role: 'Élève' }
+        ].map(u => `
                     <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid var(--border-color); border-radius: var(--border-radius-md);">
                         <div>
                             <strong style="font-size:0.95rem;">${u.name}</strong> (${u.role})
@@ -1764,10 +1956,10 @@ function renderAdminStats() {
                 <div class="card-title"><i data-lucide="activity" style="width:20px;height:20px;color:var(--color-primary)"></i> Engagement quotidien</div>
                 <div style="display:flex; flex-direction:column; gap:12px;">
                     ${[
-                        { label: 'Connexions d\'élèves uniques', val: '645', pct: 92 },
-                        { label: 'Utilisation de l\'IA FlexBot', val: '2 840 requêtes', pct: 85 },
-                        { label: 'Heures cumulées en live', val: '124 heures', pct: 78 }
-                    ].map(s => `
+            { label: 'Connexions d\'élèves uniques', val: '645', pct: 92 },
+            { label: 'Utilisation de l\'IA FlexBot', val: '2 840 requêtes', pct: 85 },
+            { label: 'Heures cumulées en live', val: '124 heures', pct: 78 }
+        ].map(s => `
                         <div>
                             <div style="display:flex; justify-content:space-between; font-size:0.9rem; font-weight:600; margin-bottom:4px;">
                                 <span>${s.label}</span><span>${s.val}</span>

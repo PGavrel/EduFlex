@@ -1762,7 +1762,7 @@ a:hover {
     
     .sidebar-nav {
         width: 100vw;
-        height: 60px;
+        height: 68px;
         position: fixed;
         bottom: 0;
         left: 0;
@@ -1772,7 +1772,9 @@ a:hover {
         border-right: none;
         border-top: 1px solid var(--border-color);
         padding: 0;
-        box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+        background: var(--bg-sidebar);
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        z-index: 9999;
     }
     
     .sidebar-logo, .sidebar-footer {
@@ -1782,27 +1784,57 @@ a:hover {
     .nav-links {
         flex-direction: row;
         width: 100%;
-        justify-content: space-around;
+        justify-content: flex-start;
         align-items: center;
+        overflow-x: auto;
         overflow-y: hidden;
-        padding: 0 10px;
+        padding: 0 16px;
+        gap: 20px;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .nav-links::-webkit-scrollbar {
+        display: none; /* Cache la barre pour un style natif */
+    }
+    
+    .nav-item {
+        flex-shrink: 0;
+        margin: 0;
     }
     
     .nav-item a {
-        padding: 8px;
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+    }
+    
+    .nav-item a i {
+        width: 20px;
+        height: 20px;
     }
     
     .main-layout {
         margin-left: 0;
-        margin-bottom: 60px; /* Space for mobile bottom bar */
+        margin-bottom: 68px; /* Espace pour la barre mobile */
     }
     
     .global-header {
         padding: 0 16px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-color);
     }
     
     .search-bar-container {
-        width: 160px;
+        width: 130px;
     }
     
     .main-content {
@@ -1812,37 +1844,68 @@ a:hover {
     .landing-hero {
         flex-direction: column;
         text-align: center;
-        padding: 20px 0 40px 0;
+        padding: 10px 0 30px 0;
+        gap: 24px;
     }
     
     .hero-title {
-        font-size: 2.2rem;
+        font-size: 1.9rem;
+        line-height: 1.3;
+    }
+    
+    .hero-desc {
+        font-size: 0.95rem;
     }
     
     .hero-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+    
+    .hero-actions .btn {
+        width: 100%;
         justify-content: center;
     }
     
-    .pricing-cards-grid, .grid-2, .grid-4 {
+    .hero-image-container {
+        width: 100%;
+    }
+    
+    .pricing-cards-grid, .grid-2, .grid-3, .grid-4 {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
     
     .target-content-card {
         flex-direction: column;
-        padding: 24px;
+        padding: 20px;
     }
     
     .chatbot-widget-container {
-        bottom: 75px; /* Stay above mobile bottom navigation bar */
-        right: 20px;
+        bottom: 85px; /* Reste bien au-dessus de la barre de navigation mobile */
+        right: 16px;
     }
     
     .chatbot-popup-window {
-        width: calc(100vw - 40px);
+        width: calc(100vw - 32px);
+        right: -4px;
+        bottom: 60px;
     }
     
     .dashboard-quick-stats {
         grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    
+    .course-subjects-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    
+    .live-sessions-catalog, .community-clubs-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 }
 
