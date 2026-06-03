@@ -372,13 +372,13 @@ function renderLandingPage() {
         <p class="section-subtitle">Une approche pédagogique unique, pensée pour les élèves aux parcours atypiques.</p>
         <div class="grid-3" style="margin-bottom:80px">
             ${[
-                { icon: 'brain', title: 'IA Pédagogique', desc: 'Un assistant intelligent disponible 24h/24 pour expliquer, guider et accompagner chaque élève.', color: 'var(--color-primary)' },
-                { icon: 'users', title: 'Enseignants certifiés', desc: "Des professeurs de l'Éducation Nationale assurent un suivi personnalisé et bienveillant.", color: 'var(--color-success)' },
-                { icon: 'calendar', title: 'Emploi du temps flexible', desc: 'Cours en direct et en replay, avec un planning adapté au rythme de chaque élève.', color: 'var(--color-warning)' },
-                { icon: 'shield', title: 'Espace sécurisé', desc: 'Un environnement numérique bienveillant, sans jugement, avec modération active.', color: 'var(--color-primary)' },
-                { icon: 'heart', title: 'Bien-être intégré', desc: 'Suivi émotionnel, exercices de relaxation et accès à des psychologues scolaires.', color: '#ec4899' },
-                { icon: 'trophy', title: 'Gamification', desc: 'Badges, récompenses et progression visible pour maintenir la motivation.', color: 'var(--color-warning)' }
-            ].map(f => `
+            { icon: 'brain', title: 'IA Pédagogique', desc: 'Un assistant intelligent disponible 24h/24 pour expliquer, guider et accompagner chaque élève.', color: 'var(--color-primary)' },
+            { icon: 'users', title: 'Enseignants certifiés', desc: "Des professeurs de l'Éducation Nationale assurent un suivi personnalisé et bienveillant.", color: 'var(--color-success)' },
+            { icon: 'calendar', title: 'Emploi du temps flexible', desc: 'Cours en direct et en replay, avec un planning adapté au rythme de chaque élève.', color: 'var(--color-warning)' },
+            { icon: 'shield', title: 'Espace sécurisé', desc: 'Un environnement numérique bienveillant, sans jugement, avec modération active.', color: 'var(--color-primary)' },
+            { icon: 'heart', title: 'Bien-être intégré', desc: 'Suivi émotionnel, exercices de relaxation et accès à des psychologues scolaires.', color: '#ec4899' },
+            { icon: 'trophy', title: 'Gamification', desc: 'Badges, récompenses et progression visible pour maintenir la motivation.', color: 'var(--color-warning)' }
+        ].map(f => `
                 <div class="card card-premium" style="text-align:center;padding:32px">
                     <div style="width:56px;height:56px;border-radius:var(--border-radius-md);background:${f.color}15;color:${f.color};display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
                         <i data-lucide="${f.icon}" style="width:28px;height:28px"></i>
@@ -394,10 +394,10 @@ function renderLandingPage() {
         <p class="section-subtitle">Des formules adaptées à chaque besoin, sans engagement.</p>
         <div class="pricing-cards-grid" style="margin-bottom:80px">
             ${[
-                { name: 'Essentiel', price: '29', period: '/mois', features: ['Cours en replay illimités', 'Assistant IA 24h/24', 'Exercices interactifs', 'Suivi de progression'], popular: false },
-                { name: 'Accompagné', price: '69', period: '/mois', features: ['Tout Essentiel +', '2h de tutorat/semaine', 'Sessions live illimitées', 'Suivi parental détaillé', 'Psychologue scolaire'], popular: true },
-                { name: 'Sur-mesure', price: '99', period: '/mois', features: ['Tout Accompagné +', '5h de tutorat/semaine', 'Programme personnalisé', 'Coaching orientation', 'Support prioritaire'], popular: false }
-            ].map(p => `
+            { name: 'Essentiel', price: '29', period: '/mois', features: ['Cours en replay illimités', 'Assistant IA 24h/24', 'Exercices interactifs', 'Suivi de progression'], popular: false },
+            { name: 'Accompagné', price: '67', period: '/mois', features: ['Tout Essentiel +', '2h de tutorat/semaine', 'Sessions live illimitées', 'Suivi parental détaillé', 'Psychologue scolaire'], popular: true },
+            { name: 'Sur-mesure', price: '99', period: '/mois', features: ['Tout Accompagné +', '5h de tutorat/semaine', 'Programme personnalisé', 'Coaching orientation', 'Support prioritaire'], popular: false }
+        ].map(p => `
                 <div class="pricing-card ${p.popular ? 'popular' : ''}">
                     <h3 style="font-size:1.1rem;font-weight:700">${p.name}</h3>
                     <div class="price-val">${p.price}€<span>${p.period}</span></div>
@@ -442,9 +442,9 @@ function renderLoginPage() {
                     <label style="font-weight:600;font-size:0.9rem;display:block;margin-bottom:8px">Je suis :</label>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="login-role-grid">
                         ${['student', 'parent', 'teacher', 'admin'].map((r, i) => {
-                            const labels = { student: '🎓 Élève', parent: '👨‍👩‍👧 Parent', teacher: '📚 Enseignant', admin: '⚙️ Admin' };
-                            return `<button type="button" class="btn btn-secondary btn-sm login-role-btn ${i === 0 ? 'active-role' : ''}" data-role="${r}" onclick="selectLoginRole('${r}', this)" style="justify-content:center">${labels[r]}</button>`;
-                        }).join('')}
+        const labels = { student: '🎓 Élève', parent: '👨‍👩‍👧 Parent', teacher: '📚 Enseignant', admin: '⚙️ Admin' };
+        return `<button type="button" class="btn btn-secondary btn-sm login-role-btn ${i === 0 ? 'active-role' : ''}" data-role="${r}" onclick="selectLoginRole('${r}', this)" style="justify-content:center">${labels[r]}</button>`;
+    }).join('')}
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:100%;padding:16px"><i data-lucide="arrow-right" style="width:18px;height:18px"></i> Se connecter</button>
@@ -506,9 +506,9 @@ function renderRegisterPage() {
                     <label style="font-weight:600;font-size:0.9rem;display:block;margin-bottom:8px">Votre profil :</label>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="reg-role-grid">
                         ${['student', 'parent', 'teacher', 'admin'].map((r, i) => {
-                            const labels = { student: '🎓 Élève', parent: '👨‍👩‍👧 Parent', teacher: '📚 Enseignant', admin: '⚙️ Admin' };
-                            return `<button type="button" class="btn btn-secondary btn-sm reg-role-btn ${i === 0 ? 'active-role' : ''}" data-role="${r}" onclick="selectRegRole('${r}', this)" style="justify-content:center">${labels[r]}</button>`;
-                        }).join('')}
+        const labels = { student: '🎓 Élève', parent: '👨‍👩‍👧 Parent', teacher: '📚 Enseignant', admin: '⚙️ Admin' };
+        return `<button type="button" class="btn btn-secondary btn-sm reg-role-btn ${i === 0 ? 'active-role' : ''}" data-role="${r}" onclick="selectRegRole('${r}', this)" style="justify-content:center">${labels[r]}</button>`;
+    }).join('')}
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:100%;padding:16px"><i data-lucide="check-circle" style="width:18px;height:18px"></i> Créer mon compte</button>
@@ -563,11 +563,11 @@ function renderStudentDashboard() {
         <!-- Quick Stats -->
         <div class="dashboard-quick-stats">
             ${[
-                { icon: 'book-open', value: '12', label: 'Cours complétés', color: 'blue' },
-                { icon: 'trophy', value: '8', label: 'Badges obtenus', color: 'orange' },
-                { icon: 'clock', value: '24h', label: 'Temps d\'étude', color: 'green' },
-                { icon: 'trending-up', value: '85%', label: 'Moyenne générale', color: 'blue' }
-            ].map(s => `
+            { icon: 'book-open', value: '12', label: 'Cours complétés', color: 'blue' },
+            { icon: 'trophy', value: '8', label: 'Badges obtenus', color: 'orange' },
+            { icon: 'clock', value: '24h', label: 'Temps d\'étude', color: 'green' },
+            { icon: 'trending-up', value: '85%', label: 'Moyenne générale', color: 'blue' }
+        ].map(s => `
                 <div class="quick-stat-card">
                     <div class="stat-icon-wrapper ${s.color}"><i data-lucide="${s.icon}" style="width:24px;height:24px"></i></div>
                     <div><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>
@@ -583,11 +583,11 @@ function renderStudentDashboard() {
                     <div class="card-title"><i data-lucide="calendar" style="width:20px;height:20px;color:var(--color-primary)"></i> Emploi du temps du jour</div>
                     <div class="schedule-timeline">
                         ${[
-                            { time: '09:00', title: 'Mathématiques', desc: 'Chapitre 5 : Fonctions affines', type: 'course' },
-                            { time: '10:30', title: 'Français – Session Live', desc: 'Analyse de texte avec Mme Dubois', type: 'live' },
-                            { time: '14:00', title: 'Histoire-Géo', desc: 'Devoir à rendre : La Révolution industrielle', type: 'homework' },
-                            { time: '16:00', title: 'SVT', desc: 'Cours en replay : La cellule animale', type: 'course' }
-                        ].map(item => `
+            { time: '09:00', title: 'Mathématiques', desc: 'Chapitre 5 : Fonctions affines', type: 'course' },
+            { time: '10:30', title: 'Français – Session Live', desc: 'Analyse de texte avec Mme Dubois', type: 'live' },
+            { time: '14:00', title: 'Histoire-Géo', desc: 'Devoir à rendre : La Révolution industrielle', type: 'homework' },
+            { time: '16:00', title: 'SVT', desc: 'Cours en replay : La cellule animale', type: 'course' }
+        ].map(item => `
                             <div class="schedule-item ${item.type}">
                                 <span class="schedule-time">${item.time}</span>
                                 <div class="schedule-dot"></div>
@@ -605,11 +605,11 @@ function renderStudentDashboard() {
                 <div class="card">
                     <div class="card-title"><i data-lucide="trending-up" style="width:20px;height:20px;color:var(--color-success)"></i> Progression des cours</div>
                     ${[
-                        { name: 'Mathématiques', progress: 72, color: '#3b82f6' },
-                        { name: 'Français', progress: 58, color: '#10b981' },
-                        { name: 'Histoire-Géo', progress: 85, color: '#f59e0b' },
-                        { name: 'SVT', progress: 40, color: '#8b5cf6' }
-                    ].map(c => `
+            { name: 'Mathématiques', progress: 72, color: '#3b82f6' },
+            { name: 'Français', progress: 58, color: '#10b981' },
+            { name: 'Histoire-Géo', progress: 85, color: '#f59e0b' },
+            { name: 'SVT', progress: 40, color: '#8b5cf6' }
+        ].map(c => `
                         <div style="margin-bottom:16px">
                             <div style="display:flex;justify-content:space-between;font-size:0.9rem;font-weight:600;margin-bottom:4px">
                                 <span>${c.name}</span><span>${c.progress}%</span>
@@ -627,13 +627,13 @@ function renderStudentDashboard() {
                     <div class="card-title"><i data-lucide="award" style="width:20px;height:20px;color:var(--color-warning)"></i> Mes Badges</div>
                     <div class="badges-panel-list">
                         ${[
-                            { icon: 'star', name: 'Première étoile', locked: false },
-                            { icon: 'zap', name: 'Série de 5', locked: false },
-                            { icon: 'flame', name: 'En feu !', locked: false },
-                            { icon: 'trophy', name: 'Champion', locked: true },
-                            { icon: 'crown', name: 'Expert', locked: true },
-                            { icon: 'gem', name: 'Diamant', locked: true }
-                        ].map(b => `
+            { icon: 'star', name: 'Première étoile', locked: false },
+            { icon: 'zap', name: 'Série de 5', locked: false },
+            { icon: 'flame', name: 'En feu !', locked: false },
+            { icon: 'trophy', name: 'Champion', locked: true },
+            { icon: 'crown', name: 'Expert', locked: true },
+            { icon: 'gem', name: 'Diamant', locked: true }
+        ].map(b => `
                             <div class="badge-item-display ${b.locked ? 'locked' : ''}">
                                 <div class="badge-icon-shield"><i data-lucide="${b.icon}" style="width:20px;height:20px"></i></div>
                                 <span class="badge-name">${b.name}</span>
@@ -674,13 +674,13 @@ function renderCoursPage() {
 
         <div class="course-subjects-grid">
             ${[
-                { icon: 'calculator', name: 'Mathématiques', progress: 72, lessons: 24, color: '#3b82f6' },
-                { icon: 'book-open', name: 'Français', progress: 58, lessons: 18, color: '#10b981' },
-                { icon: 'landmark', name: 'Histoire-Géo', progress: 85, lessons: 20, color: '#f59e0b' },
-                { icon: 'flask-conical', name: 'SVT', progress: 40, lessons: 16, color: '#8b5cf6' },
-                { icon: 'globe', name: 'Anglais', progress: 63, lessons: 22, color: '#ec4899' },
-                { icon: 'atom', name: 'Physique-Chimie', progress: 35, lessons: 14, color: '#14b8a6' }
-            ].map(s => `
+            { icon: 'calculator', name: 'Mathématiques', progress: 72, lessons: 24, color: '#3b82f6' },
+            { icon: 'book-open', name: 'Français', progress: 58, lessons: 18, color: '#10b981' },
+            { icon: 'landmark', name: 'Histoire-Géo', progress: 85, lessons: 20, color: '#f59e0b' },
+            { icon: 'flask-conical', name: 'SVT', progress: 40, lessons: 16, color: '#8b5cf6' },
+            { icon: 'globe', name: 'Anglais', progress: 63, lessons: 22, color: '#ec4899' },
+            { icon: 'atom', name: 'Physique-Chimie', progress: 35, lessons: 14, color: '#14b8a6' }
+        ].map(s => `
                 <div class="subject-card" onclick="showToast('Ouverture du cours de ${s.name}...', 'primary')">
                     <div class="subject-header-icon" style="background:${s.color}15;color:${s.color}">
                         <i data-lucide="${s.icon}" style="width:24px;height:24px"></i>
@@ -726,9 +726,24 @@ function renderCoursPage() {
 
 // ─── QUIZ ENGINE ─────────────────────────────────────────────────────────────
 const quizData = [
-    { question: 'Quelle est la forme générale d\'une fonction affine ?', options: ['f(x) = ax²+b', 'f(x) = ax+b', 'f(x) = a/x', 'f(x) = √x'], correct: 1 },
-    { question: 'Quel est le coefficient directeur de f(x) = 3x - 7 ?', options: ['7', '-7', '3', '-3'], correct: 2 },
-    { question: 'L\'ordonnée à l\'origine de f(x) = 2x + 5 est :', options: ['2', '5', '7', '0'], correct: 1 }
+    {
+        question: 'Quelle est la forme générale d\'une fonction affine ?',
+        options: ['f(x) = ax²+b', 'f(x) = ax+b', 'f(x) = a/x', 'f(x) = √x'],
+        correct: 1,
+        explanation: 'Une fonction affine est représentée par une droite. Sa formule est de la forme f(x) = ax + b, où "a" représente le coefficient directeur et "b" l\'ordonnée à l\'origine. f(x) = ax²+b est une fonction du second degré, f(x) = a/x est une fonction inverse et f(x) = √x est la fonction racine carrée.'
+    },
+    {
+        question: 'Quel est le coefficient directeur de f(x) = 3x - 7 ?',
+        options: ['7', '-7', '3', '-3'],
+        correct: 2,
+        explanation: 'Dans l\'expression ax + b, le coefficient directeur est le nombre "a" qui multiplie x. Ici, c\'est 3. Le nombre -7 correspond à l\'ordonnée à l\'origine "b".'
+    },
+    {
+        question: 'L\'ordonnée à l\'origine de f(x) = 2x + 5 est :',
+        options: ['2', '5', '7', '0'],
+        correct: 1,
+        explanation: 'L\'ordonnée à l\'origine est la valeur de f(0), c\'est-à-dire la constante "b" dans ax + b. Pour f(x) = 2x + 5, c\'est 5. C\'est le point où la droite coupe l\'axe des ordonnées (y).'
+    }
 ];
 let quizIndex = 0, quizScore = 0, quizAnswered = false;
 
@@ -752,6 +767,9 @@ function renderQuiz() {
                 <div class="quiz-option-item" onclick="answerQuiz(${i})" id="quiz-opt-${i}">${opt}</div>
             `).join('')}
         </div>
+        <div id="quiz-explanation-box" style="display:none; margin-bottom: 20px; padding: 16px; border-radius: var(--border-radius-md); background-color: var(--color-primary-light); border-left: 4px solid var(--color-primary); font-size: 0.9rem; line-height: 1.5;">
+            <strong>Explication :</strong> <span id="quiz-explanation-text"></span>
+        </div>
         <div style="display:flex;justify-content:flex-end">
             <button class="btn btn-primary btn-sm" onclick="nextQuizQuestion()" id="quiz-next-btn" style="display:none"><i data-lucide="arrow-right" style="width:16px;height:16px"></i> Suivant</button>
         </div>
@@ -761,16 +779,34 @@ function renderQuiz() {
 function answerQuiz(index) {
     if (quizAnswered) return;
     quizAnswered = true;
-    const correct = quizData[quizIndex].correct;
+    const q = quizData[quizIndex];
+    const correct = q.correct;
     const options = document.querySelectorAll('.quiz-option-item');
+
     options[correct].classList.add('correct');
     if (index === correct) {
         quizScore++;
         showToast('Bonne réponse ! 🎯', 'success');
     } else {
         options[index].classList.add('incorrect');
-        showToast('Pas tout à fait... Regarde la bonne réponse en vert.', 'warning');
+        showToast('Pas tout à fait...', 'warning');
     }
+
+    // Afficher l'explication
+    const expBox = document.getElementById('quiz-explanation-box');
+    const expText = document.getElementById('quiz-explanation-text');
+    if (expBox && expText) {
+        expText.textContent = q.explanation;
+        expBox.style.display = 'block';
+        if (index === correct) {
+            expBox.style.borderColor = 'var(--color-success)';
+            expBox.style.backgroundColor = 'var(--color-success-light)';
+        } else {
+            expBox.style.borderColor = 'var(--color-danger)';
+            expBox.style.backgroundColor = 'var(--color-danger-light)';
+        }
+    }
+
     const nextBtn = document.getElementById('quiz-next-btn');
     if (nextBtn) nextBtn.style.display = '';
 }
@@ -858,20 +894,65 @@ function sendIAMainMessage() {
     container.scrollTop = container.scrollHeight;
 }
 
+// Variable globale temporaire pour suivre si un live est en cours de lecture
+let currentActiveLiveUrl = null;
+
+function closeLiveStream() {
+    currentActiveLiveUrl = null;
+    renderApp();
+}
+
+function joinLiveStream(url) {
+    currentActiveLiveUrl = url;
+    showToast('Connexion à la session live réussie ! 🎥', 'success');
+    renderApp();
+}
+
 // ─── PAGE: SESSIONS LIVE ─────────────────────────────────────────────────────
 function renderLivePage() {
+    let playerHtml = '';
+    if (currentActiveLiveUrl) {
+        // ID de la vidéo extrait : uV_EmbYu9_E
+        const embedUrl = "https://www.youtube.com/embed/uV_EmbYu9_E?start=12&autoplay=1";
+        playerHtml = `
+            <div class="card" style="margin-bottom: 32px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div class="card-title" style="margin-bottom: 0;">
+                        <i data-lucide="video" style="width:20px;height:20px;color:var(--color-danger);animation:pulseBorder 2s infinite"></i> 
+                        Cours en Direct : Résolution d'équations (Maths)
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="closeLiveStream()">
+                        <i data-lucide="x" style="width:16px;height:16px"></i> Fermer le Live
+                    </button>
+                </div>
+                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius-md); box-shadow: var(--shadow-md); background: #000;">
+                    <iframe 
+                        src="${embedUrl}" 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        `;
+    }
+
     return `
     <div class="fade-in-up">
         <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Sessions Live</h1>
         <p style="color:var(--text-secondary);margin-bottom:32px">Participe aux cours en direct avec tes enseignants.</p>
+        
+        ${playerHtml}
+
         <div class="live-sessions-catalog">
             ${[
-                { subject: 'Maths', title: 'Résolution d\'équations', teacher: 'M. Martin', time: 'Aujourd\'hui 10:30', live: true, gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' },
-                { subject: 'Français', title: 'Commentaire de texte', teacher: 'Mme Dubois', time: 'Demain 14:00', live: false, gradient: 'linear-gradient(135deg, #10b981, #059669)' },
-                { subject: 'Histoire', title: 'La Révolution française', teacher: 'M. Leroy', time: 'Mercredi 09:00', live: false, gradient: 'linear-gradient(135deg, #f59e0b, #d97706)' },
-                { subject: 'Anglais', title: 'Oral Practice', teacher: 'Mrs. Smith', time: 'Jeudi 11:00', live: false, gradient: 'linear-gradient(135deg, #ec4899, #db2777)' },
-                { subject: 'SVT', title: 'La photosynthèse', teacher: 'Mme Garcia', time: 'Vendredi 10:00', live: false, gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)' },
-                { subject: 'Physique', title: 'Les forces en mécanique', teacher: 'M. Bernard', time: 'Vendredi 14:00', live: false, gradient: 'linear-gradient(135deg, #14b8a6, #0d9488)' }
+                { subject: 'Maths', title: 'Résolution d\'équations', teacher: 'M. Martin', time: 'Aujourd\'hui 10:30', live: true, gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', url: 'https://youtu.be/uV_EmbYu9_E?si=RHe_zoPk6W13c3DU&t=12' },
+                { subject: 'Français', title: 'Commentaire de texte', teacher: 'Mme Dubois', time: 'Demain 14:00', live: false, gradient: 'linear-gradient(135deg, #10b981, #059669)', url: null },
+                { subject: 'Histoire', title: 'La Révolution française', teacher: 'M. Leroy', time: 'Mercredi 09:00', live: false, gradient: 'linear-gradient(135deg, #f59e0b, #d97706)', url: null },
+                { subject: 'Anglais', title: 'Oral Practice', teacher: 'Mrs. Smith', time: 'Jeudi 11:00', live: false, gradient: 'linear-gradient(135deg, #ec4899, #db2777)', url: null },
+                { subject: 'SVT', title: 'La photosynthèse', teacher: 'Mme Garcia', time: 'Vendredi 10:00', live: false, gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', url: null },
+                { subject: 'Physique', title: 'Les forces en mécanique', teacher: 'M. Bernard', time: 'Vendredi 14:00', live: false, gradient: 'linear-gradient(135deg, #14b8a6, #0d9488)', url: null }
             ].map(s => `
                 <div class="live-card">
                     <div class="live-card-banner" style="background:${s.gradient}">
@@ -887,7 +968,7 @@ function renderLivePage() {
                             <div style="width:32px;height:32px;border-radius:50%;background:var(--border-color);display:flex;align-items:center;justify-content:center"><i data-lucide="user" style="width:16px;height:16px;color:var(--text-muted)"></i></div>
                             <span style="font-size:0.85rem;color:var(--text-secondary)">${s.teacher}</span>
                         </div>
-                        <button class="btn ${s.live ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="showToast('${s.live ? 'Connexion à la session live...' : 'Rappel programmé !'}', '${s.live ? 'success' : 'primary'}')">
+                        <button class="btn ${s.live ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="${s.live ? `joinLiveStream('${s.url}')` : "showToast('Rappel programmé !', 'primary');"}">
                             ${s.live ? '<i data-lucide="video" style="width:14px;height:14px"></i> Rejoindre' : '<i data-lucide="bell" style="width:14px;height:14px"></i> Me rappeler'}
                         </button>
                     </div>
@@ -906,15 +987,15 @@ function renderCommunautePage() {
         <p style="color:var(--text-secondary);margin-bottom:32px">Rejoins des clubs, échange avec d'autres élèves et partage tes passions.</p>
         <div class="community-clubs-grid">
             ${[
-                { icon: 'palette', name: 'Club Art', members: 34, color: '#ec4899' },
-                { icon: 'gamepad-2', name: 'Gaming', members: 56, color: '#8b5cf6' },
-                { icon: 'music', name: 'Musique', members: 28, color: '#f59e0b' },
-                { icon: 'code', name: 'Coding', members: 42, color: '#3b82f6' },
-                { icon: 'book-heart', name: 'Lecture', members: 19, color: '#10b981' },
-                { icon: 'camera', name: 'Photo', members: 23, color: '#14b8a6' },
-                { icon: 'drama', name: 'Théâtre', members: 15, color: '#ef4444' },
-                { icon: 'earth', name: 'Environnement', members: 31, color: '#059669' }
-            ].map(c => `
+            { icon: 'palette', name: 'Club Art', members: 34, color: '#ec4899' },
+            { icon: 'gamepad-2', name: 'Gaming', members: 56, color: '#8b5cf6' },
+            { icon: 'music', name: 'Musique', members: 28, color: '#f59e0b' },
+            { icon: 'code', name: 'Coding', members: 42, color: '#3b82f6' },
+            { icon: 'book-heart', name: 'Lecture', members: 19, color: '#10b981' },
+            { icon: 'camera', name: 'Photo', members: 23, color: '#14b8a6' },
+            { icon: 'drama', name: 'Théâtre', members: 15, color: '#ef4444' },
+            { icon: 'earth', name: 'Environnement', members: 31, color: '#059669' }
+        ].map(c => `
                 <div class="club-card" onclick="showToast('Bienvenue dans le club ${c.name} !', 'success')">
                     <div class="club-icon-circle" style="background:${c.color}15;color:${c.color}">
                         <i data-lucide="${c.icon}" style="width:28px;height:28px"></i>
@@ -929,10 +1010,10 @@ function renderCommunautePage() {
         <div class="card">
             <div class="card-title"><i data-lucide="message-square" style="width:20px;height:20px;color:var(--color-primary)"></i> Discussions récentes</div>
             ${[
-                { author: 'Léa', title: 'Comment organiser ses révisions ?', replies: 12, time: 'il y a 2h' },
-                { author: 'Thomas', title: 'Astuce pour mémoriser les dates en histoire', replies: 8, time: 'il y a 5h' },
-                { author: 'Ines', title: 'Besoin d\'aide en maths niveau 3ème', replies: 15, time: 'hier' }
-            ].map(d => `
+            { author: 'Léa', title: 'Comment organiser ses révisions ?', replies: 12, time: 'il y a 2h' },
+            { author: 'Thomas', title: 'Astuce pour mémoriser les dates en histoire', replies: 8, time: 'il y a 5h' },
+            { author: 'Ines', title: 'Besoin d\'aide en maths niveau 3ème', replies: 15, time: 'hier' }
+        ].map(d => `
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;border:1px solid var(--border-color);border-radius:var(--border-radius-md);margin-bottom:10px;cursor:pointer;transition:all var(--transition-fast)" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='var(--border-color)'">
                     <div>
                         <div style="font-weight:600;font-size:0.95rem">${d.title}</div>
@@ -959,7 +1040,7 @@ function renderBienEtrePage() {
                 <div class="card-title"><i data-lucide="brain" style="width:20px;height:20px;color:var(--color-warning)"></i> Comment te sens-tu ?</div>
                 <p style="color:var(--text-secondary);margin-bottom:16px">Évalue ton niveau de stress sur une échelle de 1 à 5.</p>
                 <div class="stress-option-buttons" id="stress-btns">
-                    ${[1,2,3,4,5].map(n => `
+                    ${[1, 2, 3, 4, 5].map(n => `
                         <button class="stress-btn-val" onclick="selectStress(${n}, this)">${n}</button>
                     `).join('')}
                 </div>
@@ -987,10 +1068,10 @@ function renderBienEtrePage() {
             <div class="card-title"><i data-lucide="phone" style="width:20px;height:20px;color:var(--color-success)"></i> Ressources & Aide</div>
             <div class="grid-3">
                 ${[
-                    { icon: 'phone', title: 'Ligne d\'écoute', desc: '3114 – Numéro national de prévention du suicide, disponible 24h/24.', color: 'var(--color-danger)' },
-                    { icon: 'message-circle', title: 'Chat avec un psy', desc: 'Un psychologue scolaire est disponible sur la plateforme.', color: 'var(--color-primary)' },
-                    { icon: 'book-heart', title: 'Articles bien-être', desc: 'Des ressources pour mieux comprendre et gérer tes émotions.', color: 'var(--color-success)' }
-                ].map(r => `
+            { icon: 'phone', title: 'Ligne d\'écoute', desc: '3114 – Numéro national de prévention du suicide, disponible 24h/24.', color: 'var(--color-danger)' },
+            { icon: 'message-circle', title: 'Chat avec un psy', desc: 'Un psychologue scolaire est disponible sur la plateforme.', color: 'var(--color-primary)' },
+            { icon: 'book-heart', title: 'Articles bien-être', desc: 'Des ressources pour mieux comprendre et gérer tes émotions.', color: 'var(--color-success)' }
+        ].map(r => `
                     <div class="card card-premium" style="text-align:center;cursor:pointer" onclick="showToast('Ouverture de la ressource...', 'primary')">
                         <div style="width:48px;height:48px;border-radius:50%;background:${r.color}15;color:${r.color};display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
                             <i data-lucide="${r.icon}" style="width:22px;height:22px"></i>
@@ -1058,7 +1139,7 @@ function renderWhiteboardPage() {
             </div>
             <div class="whiteboard-controls">
                 <div class="whiteboard-colors">
-                    ${['#0f172a','#3b82f6','#10b981','#ef4444','#f59e0b','#8b5cf6','#ec4899'].map((c, i) => `
+                    ${['#0f172a', '#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#ec4899'].map((c, i) => `
                         <div class="color-swatch ${i === 0 ? 'active' : ''}" style="background:${c}" onclick="setWBColor('${c}', this)"></div>
                     `).join('')}
                 </div>
@@ -1130,11 +1211,11 @@ function renderParentDashboard() {
             <div class="card">
                 <div class="card-title"><i data-lucide="bar-chart-3" style="width:20px;height:20px;color:var(--color-primary)"></i> Progression hebdomadaire</div>
                 ${[
-                    { name: 'Mathématiques', grade: '16/20', progress: 80 },
-                    { name: 'Français', grade: '14/20', progress: 70 },
-                    { name: 'Histoire-Géo', grade: '17/20', progress: 85 },
-                    { name: 'SVT', grade: '12/20', progress: 60 }
-                ].map(s => `
+            { name: 'Mathématiques', grade: '16/20', progress: 80 },
+            { name: 'Français', grade: '14/20', progress: 70 },
+            { name: 'Histoire-Géo', grade: '17/20', progress: 85 },
+            { name: 'SVT', grade: '12/20', progress: 60 }
+        ].map(s => `
                     <div style="margin-bottom:14px">
                         <div style="display:flex;justify-content:space-between;font-size:0.9rem;font-weight:600;margin-bottom:4px">
                             <span>${s.name}</span><span class="badge badge-primary">${s.grade}</span>
@@ -1174,11 +1255,11 @@ function renderTeacherDashboard() {
 
         <div class="dashboard-quick-stats">
             ${[
-                { icon: 'users', value: '24', label: 'Élèves suivis', color: 'blue' },
-                { icon: 'video', value: '2', label: 'Sessions aujourd\'hui', color: 'green' },
-                { icon: 'file-text', value: '5', label: 'Devoirs à corriger', color: 'orange' },
-                { icon: 'star', value: '4.8', label: 'Note moyenne', color: 'blue' }
-            ].map(s => `
+            { icon: 'users', value: '24', label: 'Élèves suivis', color: 'blue' },
+            { icon: 'video', value: '2', label: 'Sessions aujourd\'hui', color: 'green' },
+            { icon: 'file-text', value: '5', label: 'Devoirs à corriger', color: 'orange' },
+            { icon: 'star', value: '4.8', label: 'Note moyenne', color: 'blue' }
+        ].map(s => `
                 <div class="quick-stat-card">
                     <div class="stat-icon-wrapper ${s.color}"><i data-lucide="${s.icon}" style="width:24px;height:24px"></i></div>
                     <div><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>
@@ -1191,11 +1272,11 @@ function renderTeacherDashboard() {
                 <div class="card-title"><i data-lucide="users" style="width:20px;height:20px;color:var(--color-primary)"></i> Mes Élèves</div>
                 <div class="teacher-inbox-preview">
                     ${[
-                        { name: 'Léa Martin', status: 'En ligne', progress: 85, mood: '😄' },
-                        { name: 'Thomas Dupont', status: 'Hors ligne', progress: 62, mood: '😐' },
-                        { name: 'Inès Boucher', status: 'En cours', progress: 78, mood: '🙂' },
-                        { name: 'Lucas Moreau', status: 'En ligne', progress: 45, mood: '😟' }
-                    ].map(s => `
+            { name: 'Léa Martin', status: 'En ligne', progress: 85, mood: '😄' },
+            { name: 'Thomas Dupont', status: 'Hors ligne', progress: 62, mood: '😐' },
+            { name: 'Inès Boucher', status: 'En cours', progress: 78, mood: '🙂' },
+            { name: 'Lucas Moreau', status: 'En ligne', progress: 45, mood: '😟' }
+        ].map(s => `
                         <div class="teacher-student-row">
                             <div style="display:flex;align-items:center;gap:12px">
                                 <div style="width:36px;height:36px;border-radius:50%;background:var(--color-primary-light);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--color-primary);font-size:0.85rem">${s.name.charAt(0)}</div>
@@ -1218,10 +1299,10 @@ function renderTeacherDashboard() {
             <div class="card">
                 <div class="card-title"><i data-lucide="calendar" style="width:20px;height:20px;color:var(--color-success)"></i> Prochaines sessions</div>
                 ${[
-                    { time: '10:30', title: 'Maths – 3ème', type: 'live' },
-                    { time: '14:00', title: 'Maths – 2nde', type: 'live' },
-                    { time: '16:00', title: 'Correction devoirs', type: 'homework' }
-                ].map(s => `
+            { time: '10:30', title: 'Maths – 3ème', type: 'live' },
+            { time: '14:00', title: 'Maths – 2nde', type: 'live' },
+            { time: '16:00', title: 'Correction devoirs', type: 'homework' }
+        ].map(s => `
                     <div class="schedule-item ${s.type}" style="margin-bottom:8px">
                         <span class="schedule-time">${s.time}</span>
                         <div class="schedule-dot"></div>
@@ -1247,11 +1328,11 @@ function renderAdminDashboard() {
 
         <div class="dashboard-quick-stats">
             ${[
-                { icon: 'users', value: '1,247', label: 'Utilisateurs actifs', color: 'blue' },
-                { icon: 'graduation-cap', value: '892', label: 'Élèves inscrits', color: 'green' },
-                { icon: 'book-open', value: '156', label: 'Cours publiés', color: 'orange' },
-                { icon: 'trending-up', value: '97%', label: 'Satisfaction', color: 'green' }
-            ].map(s => `
+            { icon: 'users', value: '1,247', label: 'Utilisateurs actifs', color: 'blue' },
+            { icon: 'graduation-cap', value: '892', label: 'Élèves inscrits', color: 'green' },
+            { icon: 'book-open', value: '156', label: 'Cours publiés', color: 'orange' },
+            { icon: 'trending-up', value: '97%', label: 'Satisfaction', color: 'green' }
+        ].map(s => `
                 <div class="quick-stat-card">
                     <div class="stat-icon-wrapper ${s.color}"><i data-lucide="${s.icon}" style="width:24px;height:24px"></i></div>
                     <div><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>
@@ -1263,11 +1344,11 @@ function renderAdminDashboard() {
             <div class="card">
                 <div class="card-title"><i data-lucide="activity" style="width:20px;height:20px;color:var(--color-primary)"></i> Activité récente</div>
                 ${[
-                    { text: 'Nouveau compte élève créé : Léa M.', time: 'il y a 15 min', icon: 'user-plus', color: 'var(--color-success)' },
-                    { text: 'Cours publié : "Les fractions" par M. Martin', time: 'il y a 1h', icon: 'book-open', color: 'var(--color-primary)' },
-                    { text: 'Session live terminée : Français 3ème', time: 'il y a 2h', icon: 'video', color: 'var(--color-warning)' },
-                    { text: 'Alerte bien-être : Lucas M. (stress élevé)', time: 'il y a 3h', icon: 'heart', color: 'var(--color-danger)' }
-                ].map(a => `
+            { text: 'Nouveau compte élève créé : Léa M.', time: 'il y a 15 min', icon: 'user-plus', color: 'var(--color-success)' },
+            { text: 'Cours publié : "Les fractions" par M. Martin', time: 'il y a 1h', icon: 'book-open', color: 'var(--color-primary)' },
+            { text: 'Session live terminée : Français 3ème', time: 'il y a 2h', icon: 'video', color: 'var(--color-warning)' },
+            { text: 'Alerte bien-être : Lucas M. (stress élevé)', time: 'il y a 3h', icon: 'heart', color: 'var(--color-danger)' }
+        ].map(a => `
                     <div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border-color)">
                         <div style="width:36px;height:36px;min-width:36px;border-radius:50%;background:${a.color}15;color:${a.color};display:flex;align-items:center;justify-content:center">
                             <i data-lucide="${a.icon}" style="width:16px;height:16px"></i>
@@ -1283,11 +1364,11 @@ function renderAdminDashboard() {
                 <div class="card-title"><i data-lucide="pie-chart" style="width:20px;height:20px;color:var(--color-success)"></i> Répartition utilisateurs</div>
                 <div style="padding:20px">
                     ${[
-                        { label: 'Élèves', count: 892, pct: 72, color: '#3b82f6' },
-                        { label: 'Parents', count: 245, pct: 20, color: '#10b981' },
-                        { label: 'Enseignants', count: 85, pct: 7, color: '#f59e0b' },
-                        { label: 'Admins', count: 25, pct: 1, color: '#8b5cf6' }
-                    ].map(u => `
+            { label: 'Élèves', count: 892, pct: 72, color: '#3b82f6' },
+            { label: 'Parents', count: 245, pct: 20, color: '#10b981' },
+            { label: 'Enseignants', count: 85, pct: 7, color: '#f59e0b' },
+            { label: 'Admins', count: 25, pct: 1, color: '#8b5cf6' }
+        ].map(u => `
                         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
                             <div style="width:12px;height:12px;border-radius:3px;background:${u.color}"></div>
                             <span style="flex:1;font-weight:500">${u.label}</span>
