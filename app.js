@@ -12,7 +12,20 @@ const DEFAULT_STATE = {
     fontSize: 'medium',
     dyslexicMode: false,
     mood: null,
-    ttsActive: false
+    ttsActive: false,
+    lastStudiedSubject: 'Mathématiques',
+    activeSubject: 'Mathématiques',
+    activeChatContact: null,
+    checklistCandidatLibre: {
+        readStatut: false,
+        checkDocs: false,
+        submitForm: false,
+        payFees: false
+    },
+    examSimulating: false,
+    examTimeRemaining: 0,
+    examSubject: 'Mathématiques',
+    examScore: null
 };
 
 function loadState() {
@@ -156,8 +169,11 @@ function getNavItems() {
         case 'student': return [
             ...common,
             { id: 'cours', label: 'Mes Cours', icon: 'book-open' },
+            { id: 'calendrier', label: 'Calendrier', icon: 'calendar' },
+            { id: 'examens', label: 'Examens', icon: 'graduation-cap' },
             { id: 'ia-assistant', label: 'Assistant IA', icon: 'bot' },
             { id: 'live', label: 'Sessions Live', icon: 'video' },
+            { id: 'messages', label: 'Messagerie', icon: 'mail' },
             { id: 'communaute', label: 'Communauté', icon: 'users' },
             { id: 'bienetre', label: 'Bien-être', icon: 'heart' },
             { id: 'whiteboard', label: 'Tableau Blanc', icon: 'pen-tool' }
@@ -216,7 +232,7 @@ function renderSidebar() {
         </ul>
         <div class="sidebar-footer">
             <div class="user-profile-summary" onclick="logout()">
-                <div class="user-avatar" style="background:linear-gradient(135deg,var(--color-primary),var(--color-success));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1rem;border:none;">
+                <div class="user-avatar" style="background:linear-gradient(135deg,var(--color-primary),var(--color-success));display:flex;align-items:center;justify-content:center;color:var(--text-on-primary,white);font-weight:700;font-size:1rem;border:none;">
                     ${APP.username.charAt(0).toUpperCase()}
                 </div>
                 <div class="user-info-text">
@@ -430,7 +446,7 @@ function renderLoginPage() {
     <div class="fade-in-up" style="max-width:460px;margin:40px auto">
         <div class="card" style="padding:40px">
             <div style="text-align:center;margin-bottom:32px">
-                <div style="width:64px;height:64px;border-radius:var(--border-radius-md);background:linear-gradient(135deg,var(--color-primary),var(--color-success));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:white">
+                <div style="width:64px;height:64px;border-radius:var(--border-radius-md);background:linear-gradient(135deg,var(--color-primary),var(--color-success));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--text-on-primary,white)">
                     <i data-lucide="log-in" style="width:30px;height:30px"></i>
                 </div>
                 <h1 style="font-size:1.6rem;font-weight:800;margin-bottom:8px">Connexion</h1>
@@ -484,7 +500,7 @@ function renderRegisterPage() {
     <div class="fade-in-up" style="max-width:520px;margin:40px auto">
         <div class="card" style="padding:40px">
             <div style="text-align:center;margin-bottom:32px">
-                <div style="width:64px;height:64px;border-radius:var(--border-radius-md);background:linear-gradient(135deg,var(--color-primary),var(--color-success));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:white">
+                <div style="width:64px;height:64px;border-radius:var(--border-radius-md);background:linear-gradient(135deg,var(--color-primary),var(--color-success));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--text-on-primary,white)">
                     <i data-lucide="user-plus" style="width:30px;height:30px"></i>
                 </div>
                 <h1 style="font-size:1.6rem;font-weight:800;margin-bottom:8px">Créer un compte</h1>
@@ -814,8 +830,23 @@ function renderCoursPage() {
 
     return `
     <div class="fade-in-up">
-        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Mes Cours</h1>
-        <p style="color:var(--text-secondary);margin-bottom:32px">Explore tes matières, consulte tes fiches et continue ta progression.</p>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+            <div>
+                <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Mes Cours</h1>
+                <p style="color:var(--text-secondary)">Explore tes matières, consulte tes fiches et continue ta progression.</p>
+            </div>
+            <button class="btn btn-primary" onclick="selectSubject('${APP.lastStudiedSubject || 'Mathématiques'}'); showToast('Reprise du cours de ${APP.lastStudiedSubject || 'Mathématiques'}', 'success')">
+                <i data-lucide="play-circle" style="width:18px;height:18px"></i> Reprendre où je m'étais arrêté (${APP.lastStudiedSubject || 'Mathématiques'})
+            </button>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="card" style="padding:16px; margin-bottom:24px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+            <span style="font-weight:600; font-size:0.9rem;"><i data-lucide="filter" style="width:16px;height:16px;vertical-align:middle;margin-right:6px"></i>Niveau d'études :</span>
+            <button class="btn btn-primary btn-sm" style="padding:6px 12px">Tous</button>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Filtré pour le Collège', 'primary')" style="padding:6px 12px">Collège (3ème)</button>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Filtré pour le Lycée', 'primary')" style="padding:6px 12px">Lycée (Seconde/1ère)</button>
+        </div>
 
         <!-- Subjects Grid -->
         <div class="course-subjects-grid" style="margin-bottom: 40px">
@@ -907,7 +938,8 @@ function renderCoursPage() {
             <div class="fiche-modal-body" style="font-size:0.95rem;line-height:1.6;color:var(--text-primary)">
                 ${activePreviewFiche.contentHtml}
             </div>
-            <div style="margin-top:32px;display:flex;justify-content:flex-end;gap:12px">
+            <div style="margin-top:32px;display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap">
+                <button class="btn btn-secondary" onclick="toggleTTSFiche()" id="tts-fiche-btn"><i data-lucide="volume-2" style="width:16px;height:16px"></i> Lire à haute voix</button>
                 <button class="btn btn-secondary" onclick="closeFichePreview()">Fermer</button>
                 <button class="btn btn-primary" onclick="showToast('Téléchargement démarré...', 'success'); closeFichePreview()"><i data-lucide="download" style="width:16px;height:16px"></i> Télécharger PDF</button>
             </div>
@@ -919,6 +951,7 @@ function renderCoursPage() {
 
 function selectSubject(subjectName) {
     APP.activeSubject = subjectName;
+    APP.lastStudiedSubject = subjectName;
     saveState();
     quizIndex = 0;
     quizScore = 0;
@@ -937,7 +970,22 @@ function previewFiche(ficheId) {
 
 function closeFichePreview() {
     activePreviewFiche = null;
+    speechSynthesis.cancel();
     renderApp();
+}
+
+function toggleTTSFiche() {
+    if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+        showToast("Lecture audio arrêtée", "primary");
+    } else if (activePreviewFiche) {
+        // Strip HTML tag utilities for speaking
+        const rawText = activePreviewFiche.contentHtml.replace(/<[^>]*>/g, ' ');
+        const utterance = new SpeechSynthesisUtterance(rawText);
+        utterance.lang = 'fr-FR';
+        speechSynthesis.speak(utterance);
+        showToast("Lecture audio démarrée", "success");
+    }
 }
 
 const quizData = []; // Fallback for references, but functions will use dynamic evaluation
@@ -1163,7 +1211,7 @@ function renderLivePage() {
                 <div class="live-card">
                     <div class="live-card-banner" style="background:${s.gradient}">
                         <div style="display:flex;justify-content:space-between;align-items:center">
-                            <span class="badge" style="background:rgba(255,255,255,0.2);color:white">${s.subject}</span>
+                            <span class="badge" style="background:rgba(255,255,255,0.2);color:var(--text-on-primary,white)">${s.subject}</span>
                             ${s.live ? '<span class="badge badge-danger" style="background:var(--color-danger);color:white">● LIVE</span>' : ''}
                         </div>
                         <span style="font-size:0.85rem;opacity:0.9">${s.time}</span>
@@ -1708,7 +1756,7 @@ function renderParentMessages() {
         <div class="ia-chat-interface" style="height: 500px;">
             <div class="ia-chat-header">
                 <div class="ia-chat-botinfo">
-                    <div style="width:40px;height:40px;border-radius:50%;background:var(--color-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;">MM</div>
+                    <div style="width:40px;height:40px;border-radius:50%;background:var(--color-primary);color:var(--text-on-primary,white);display:flex;align-items:center;justify-content:center;font-weight:700;">MM</div>
                     <div>
                         <strong>M. Martin (Tuteur Principal)</strong>
                         <div style="font-size:0.75rem;color:var(--text-secondary);">Enseignant de Mathématiques</div>
@@ -2050,9 +2098,11 @@ function getPageContent() {
         case 'communaute': return renderCommunautePage();
         case 'bienetre': return renderBienEtrePage();
         case 'whiteboard': return renderWhiteboardPage();
+        case 'calendrier': return renderCalendrierPage();
+        case 'examens': return renderExamensPage();
+        case 'messages': return renderMessageriePage();
         // Parent pages
         case 'suivi': return renderParentSuivi();
-        case 'messages': return renderParentMessages();
         case 'facturation': return renderParentFacturation();
         // Teacher pages
         case 'mes-eleves': return renderTeacherStudents();
@@ -2068,7 +2118,765 @@ function getPageContent() {
     }
 }
 
+
+// ─── NOUVELLES PAGES DE LA REFONTE MAJEURE ─────────────────────────────────────
+
+// ─── MESSAGERIE MULTI-PROFILS ET CHAT FLUIDE ──────────────────────────────────
+const MESSAGES_CONTACTS = [
+    { id: 'tuteur-martin', name: 'M. Martin (Tuteur Principal)', role: 'Enseignant', initiales: 'MM', lastMsg: 'Excellent travail cette semaine !', time: '10:30', online: true },
+    { id: 'prof-dubois', name: 'Mme Dubois (Français)', role: 'Enseignant', initiales: 'MD', lastMsg: 'Pense à rendre ton devoir d\'analyse littéraire.', time: 'Hier', online: false },
+    { id: 'psy-scolaire', name: 'Mme Benhamou (Psy Scolaire)', role: 'Psychologue', initiales: 'MB', lastMsg: 'Comment te sens-tu avec ton nouveau planning ?', time: 'Lundi', online: true },
+    { id: 'buddy-lucas', name: 'Lucas Moreau (Camarade)', role: 'Camarade', initiales: 'LM', lastMsg: 'Tu veux faire une session révision demain ?', time: '15:12', online: true }
+];
+
+let MESSAGES_HISTORY = {
+    'tuteur-martin': [
+        { sender: 'them', text: 'Bonjour ! J\'espère que tu vas bien. Es-tu prêt pour le live de maths de ce matin ?', time: '09:15' },
+        { sender: 'me', text: 'Bonjour M. Martin, oui j\'ai fini de réviser la fiche sur les fonctions affines !', time: '09:20' },
+        { sender: 'them', text: 'Excellent travail cette semaine ! Ta rigueur paie.', time: '10:30' }
+    ],
+    'prof-dubois': [
+        { sender: 'them', text: 'Bonjour, n\'oublie pas de consulter la fiche de méthodologie sur le commentaire composé.', time: 'Hier' }
+    ],
+    'psy-scolaire': [
+        { sender: 'them', text: 'Bonjour ! N\'oublie pas que l\'espace bien-être est là si tu te sens débordé.', time: 'Lundi' }
+    ],
+    'buddy-lucas': [
+        { sender: 'them', text: 'Salut ! J\'ai un peu de mal avec l\'exercice 4 en maths, tu as réussi ?', time: '14:30' },
+        { sender: 'me', text: 'Salut Lucas ! Oui, j\'ai utilisé la formule y = ax + b, je t\'explique si tu veux.', time: '14:45' },
+        { sender: 'them', text: 'Tu veux faire une session révision demain ?', time: '15:12' }
+    ]
+};
+
+function renderMessageriePage() {
+    APP.activeChatContact = APP.activeChatContact || MESSAGES_CONTACTS[0].id;
+    const activeContact = MESSAGES_CONTACTS.find(c => c.id === APP.activeChatContact) || MESSAGES_CONTACTS[0];
+    const messages = MESSAGES_HISTORY[activeContact.id] || [];
+
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Messagerie sécurisée</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Échanges bienveillants et sécurisés avec l'équipe pédagogique et tes camarades.</p>
+
+        <div class="messagerie-container">
+            <!-- Sidebar Contacts -->
+            <div class="contacts-sidebar">
+                <div class="contacts-header">
+                    <div class="search-bar-container" style="width:100%">
+                        <i data-lucide="search" style="width:16px;height:16px;color:var(--text-muted)"></i>
+                        <input class="search-input" type="text" placeholder="Rechercher..." style="padding:8px 8px 8px 32px">
+                    </div>
+                </div>
+                <div class="contacts-list">
+                    ${MESSAGES_CONTACTS.map(c => {
+                        const isActive = c.id === activeContact.id;
+                        return `
+                        <div class="contact-item ${isActive ? 'active' : ''}" onclick="selectChatContact('${c.id}')">
+                            <div class="contact-avatar">
+                                ${c.initiales}
+                                ${c.online ? '<span style="position:absolute;bottom:0;right:0;width:12px;height:12px;background-color:var(--color-success);border:2px solid var(--bg-card);border-radius:50%"></span>' : ''}
+                            </div>
+                            <div class="contact-info">
+                                <div class="contact-name-row">
+                                    <span class="contact-name">${c.name}</span>
+                                    <span class="contact-time">${c.time}</span>
+                                </div>
+                                <div class="contact-last-msg">${c.lastMsg}</div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+
+            <!-- Chat View -->
+            <div class="chat-area">
+                <div class="ia-chat-header" style="border-bottom: 1px solid var(--border-color); padding: 14px 20px;">
+                    <div class="ia-chat-botinfo">
+                        <div class="contact-avatar" style="width:36px;height:36px;font-size:0.85rem">${activeContact.initiales}</div>
+                        <div>
+                            <strong>${activeContact.name}</strong>
+                            <div style="font-size:0.75rem;color:var(--text-secondary)">
+                                ${activeContact.online ? '🟢 En ligne' : '⚪ Hors ligne'} · ${activeContact.role}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ia-messages-container" id="chat-messages-box" style="padding: 20px; flex-grow: 1; overflow-y: auto;">
+                    ${messages.map(m => `
+                        <div class="chat-bubble-wrapper ${m.sender === 'me' ? 'student' : 'ia'}">
+                            ${m.sender !== 'me' ? `<div class="contact-avatar" style="width:32px;height:32px;min-width:32px;font-size:0.75rem;margin-right:8px">${activeContact.initiales}</div>` : ''}
+                            <div class="chat-bubble" style="${m.sender === 'me' ? 'background-color:var(--color-primary);color:var(--text-on-primary,white)' : ''}">
+                                ${m.text}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="chat-input-bar" style="border-top:1px solid var(--border-color);padding:16px">
+                    <input type="text" class="chat-input-field" placeholder="Rédiger votre message..." id="message-chat-input" onkeydown="if(event.key==='Enter') sendUserChatMessage()">
+                    <button class="btn btn-primary btn-sm" onclick="sendUserChatMessage()"><i data-lucide="send" style="width:16px;height:16px"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function selectChatContact(contactId) {
+    APP.activeChatContact = contactId;
+    saveState();
+    renderApp();
+}
+
+function sendUserChatMessage() {
+    const input = document.getElementById('message-chat-input');
+    const container = document.getElementById('chat-messages-box');
+    if (!input || !input.value.trim()) return;
+    const text = input.value.trim();
+    input.value = '';
+
+    const contactId = APP.activeChatContact || MESSAGES_CONTACTS[0].id;
+    MESSAGES_HISTORY[contactId].push({ sender: 'me', text: text, time: 'À l\'instant' });
+    
+    // Update sidebar last message
+    const contact = MESSAGES_CONTACTS.find(c => c.id === contactId);
+    if (contact) {
+        contact.lastMsg = text;
+        contact.time = 'À l\'instant';
+    }
+
+    renderApp();
+
+    // Auto simulated response
+    setTimeout(() => {
+        let reply = "J'ai bien reçu ton message. Je te réponds dès que possible ! 👍";
+        if (contactId === 'buddy-lucas') {
+            reply = "Génial, merci beaucoup pour ton aide ! Je suis dispo vers 15h.";
+        } else if (contactId === 'tuteur-martin') {
+            reply = "Parfait, je note ça dans ton suivi. Continue sur cette dynamique positive !";
+        }
+        MESSAGES_HISTORY[contactId].push({ sender: 'them', text: reply, time: 'À l\'instant' });
+        if (contact) {
+            contact.lastMsg = reply;
+        }
+        showToast('Nouveau message reçu', 'success');
+        renderApp();
+    }, 1200);
+}
+
+// ─── CALENDRIER INTERACTIF ───────────────────────────────────────────────────
+let CALENDAR_EVENTS = [
+    { day: 3, title: 'Maths : Fonctions affines', type: 'course', time: '09:00' },
+    { day: 3, title: 'Français : Live Dubois', type: 'live', time: '10:30', url: 'https://youtu.be/uV_EmbYu9_E' },
+    { day: 4, title: 'Devoir : Révolution ind.', type: 'homework', time: '14:00' },
+    { day: 5, title: 'SVT : Mitose cellulaire', type: 'course', time: '16:00' },
+    { day: 10, title: 'Exam Blanc : Français', type: 'homework', time: '08:30' },
+    { day: 15, title: 'Tutorat individuel', type: 'personal', time: '11:00' }
+];
+
+function renderCalendrierPage() {
+    return `
+    <div class="fade-in-up">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px;">
+            <div>
+                <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Mon Calendrier</h1>
+                <p style="color:var(--text-secondary)">Gère ton planning de cours, tes devoirs à rendre et rejoins tes classes virtuelles.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAddEventModal()"><i data-lucide="plus" style="width:18px;height:18px"></i> Ajouter un rappel</button>
+        </div>
+
+        <div class="card" style="padding:0; overflow:hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:20px; border-bottom:1px solid var(--border-color); flex-wrap:wrap; gap:12px">
+                <h3 style="font-weight:800;font-size:1.2rem">Juin 2026</h3>
+                <div style="display:flex; gap:8px">
+                    <button class="btn btn-secondary btn-sm" onclick="showToast('Mois précédent', 'primary')"><i data-lucide="chevron-left" style="width:16px;height:16px"></i></button>
+                    <button class="btn btn-secondary btn-sm" onclick="showToast('Mois suivant', 'primary')"><i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+                </div>
+            </div>
+
+            <div class="calendar-grid-header">
+                <div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div>Sam</div><div>Dim</div>
+            </div>
+            <div class="calendar-grid-body">
+                <!-- Empty cells for start of June 2026 (starts on a Monday) -->
+                ${Array.from({ length: 30 }).map((_, i) => {
+                    const dayNum = i + 1;
+                    const isToday = dayNum === 3; // Let's assume today is June 3rd, 2026
+                    const dayEvents = CALENDAR_EVENTS.filter(e => e.day === dayNum);
+                    
+                    return `
+                    <div class="calendar-day-cell ${isToday ? 'today' : ''}">
+                        <span class="calendar-day-num">${dayNum}</span>
+                        ${dayEvents.map(e => `
+                            <div class="calendar-event-item ${e.type}" onclick="handleCalendarEventClick('${e.title}', '${e.type}', '${e.url || ''}')" title="${e.time} - ${e.title}">
+                                <span>${e.time}</span> ${e.title}
+                            </div>
+                        `).join('')}
+                    </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function handleCalendarEventClick(title, type, url) {
+    if (type === 'live' && url) {
+        joinLiveStream(url);
+        navigateTo('live');
+    } else {
+        showToast(`Détail : ${title}`, 'primary');
+    }
+}
+
+function openAddEventModal() {
+    const title = prompt("Titre de l'événement :");
+    if (!title) return;
+    const time = prompt("Heure (ex: 14:00) :", "14:00");
+    const day = parseInt(prompt("Jour de Juin (1 à 30) :", "3"));
+    if (isNaN(day) || day < 1 || day > 30) {
+        showToast("Jour invalide", "danger");
+        return;
+    }
+    CALENDAR_EVENTS.push({ day, title, time, type: 'personal' });
+    showToast("Événement ajouté au calendrier !", "success");
+    renderApp();
+}
+
+// ─── PRÉPARATION EXAMENS & CANDIDAT LIBRE ────────────────────────────────────
+function renderExamensPage() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Préparation aux examens</h1>
+        <p style="color:var(--text-secondary);margin-bottom:32px">Tout le nécessaire pour préparer ton Brevet, ton Baccalauréat et t'inscrire en Candidat Libre.</p>
+
+        <div class="grid-2">
+            <!-- Simulated Preparation Progress -->
+            <div class="card">
+                <div class="card-title"><i data-lucide="trending-up" style="width:20px;height:20px;color:var(--color-primary)"></i> Niveau de préparation simulé</div>
+                <div style="text-align:center; padding: 20px 0;">
+                    <div style="font-size: 3rem; font-weight:800; color:var(--color-primary)">78%</div>
+                    <p style="color:var(--text-secondary); margin-top: 8px;">Maîtrise globale estimée par l'IA</p>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:12px">
+                    ${[
+                        { subject: 'Mathématiques', val: 82, color: 'blue' },
+                        { subject: 'Français', val: 75, color: 'green' },
+                        { subject: 'Histoire-Géo', val: 90, color: 'orange' },
+                        { subject: 'SVT / Sciences', val: 65, color: 'purple' }
+                    ].map(s => `
+                        <div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:600;margin-bottom:4px">
+                                <span>${s.subject}</span><span>${s.val}%</span>
+                            </div>
+                            <div class="progress-container"><div class="progress-fill" style="width:${s.val}%;background-color:var(--color-${s.color})"></div></div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:20px" onclick="navigateTo('cours')">Consolider mes matières faibles</button>
+            </div>
+
+            <!-- Exam simulator -->
+            <div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
+                <div>
+                    <div class="card-title"><i data-lucide="award" style="width:20px;height:20px;color:var(--color-success)"></i> Examens Blancs</div>
+                    <p style="color:var(--text-secondary);margin-bottom:16px">Simule une épreuve nationale dans les conditions réelles pour mesurer tes compétences.</p>
+                    <div style="background-color:var(--bg-primary);padding:16px;border-radius:var(--border-radius-md);margin-bottom:16px">
+                        <strong>Epreuve disponible :</strong> Brevet Général 2026 - Mathématiques<br>
+                        <small style="color:var(--text-secondary)">Durée : 2h (simulée en 2 minutes) · 4 exercices</small>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="startExamSimulation('Mathématiques')"><i data-lucide="play" style="width:18px;height:18px"></i> Lancer l'examen blanc</button>
+            </div>
+        </div>
+
+        <!-- Candidat Libre Section -->
+        <div class="card" style="margin-top:24px">
+            <div class="card-title" style="color:var(--color-primary);font-size:1.3rem"><i data-lucide="info" style="width:24px;height:24px"></i> Accompagnement Inscription Candidat Libre</div>
+            <p style="color:var(--text-secondary);margin-bottom:20px">Parce que s'inscrire aux examens nationaux en dehors d'un établissement classique réclame de la méthode, EduFlex t'accompagne pas-à-pas.</p>
+            
+            <div class="grid-2">
+                <div>
+                    <h4 style="font-weight:700;margin-bottom:12px">Checklist des démarches administratives</h4>
+                    <div style="display:flex; flex-direction:column; gap:12px">
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                            <input type="checkbox" ${APP.checklistCandidatLibre.readStatut ? 'checked' : ''} onchange="toggleChecklistStep('readStatut')">
+                            <span>Lire le guide officiel du statut de candidat libre</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                            <input type="checkbox" ${APP.checklistCandidatLibre.checkDocs ? 'checked' : ''} onchange="toggleChecklistStep('checkDocs')">
+                            <span>Rassembler les pièces (CNI, attestation de recensement)</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                            <input type="checkbox" ${APP.checklistCandidatLibre.submitForm ? 'checked' : ''} onchange="toggleChecklistStep('submitForm')">
+                            <span>S'enregistrer sur l'application Cyclades (Académie)</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                            <input type="checkbox" ${APP.checklistCandidatLibre.payFees ? 'checked' : ''} onchange="toggleChecklistStep('payFees')">
+                            <span>Valider le dossier d'inscription finalisé</span>
+                        </label>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" style="margin-top:16px" onclick="showToast('Téléchargement de la checklist PDF...', 'success')"><i data-lucide="download" style="width:14px;height:14px;margin-right:5px"></i> Télécharger la fiche mémo</button>
+                </div>
+                <div style="background-color:var(--bg-primary);padding:20px;border-radius:var(--border-radius-lg)">
+                    <h4 style="font-weight:700;margin-bottom:8px">Dates limites & Vigilance</h4>
+                    <ul style="padding-left:20px;margin-bottom:16px;font-size:0.9rem;display:flex;flex-direction:column;gap:8px">
+                        <li><strong>Octobre - Novembre 2026 :</strong> Inscriptions ouvertes sur Cyclades.</li>
+                        <li><strong>Décembre 2026 :</strong> Date limite de dépôt des justificatifs.</li>
+                        <li><strong>Mai 2027 :</strong> Réception des convocations aux centres d'examen.</li>
+                    </ul>
+                    <div style="background-color:var(--color-primary-light);padding:12px;border-radius:var(--border-radius-md);border-left:4px solid var(--color-primary);font-size:0.85rem">
+                        ⚠️ Les dates varient selon les académies. Contactez nos conseillers EduFlex via la messagerie pour vérifier votre dossier.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function toggleChecklistStep(stepKey) {
+    APP.checklistCandidatLibre[stepKey] = !APP.checklistCandidatLibre[stepKey];
+    saveState();
+    showToast("Démarches d'inscription mises à jour", "success");
+    renderApp();
+}
+
+// ─── MODULE EXAMENS BLANCS CHRONOMÉTRÉS ───────────────────────────────────────
+let examTimerInterval = null;
+
+function startExamSimulation(subjectName) {
+    APP.examSimulating = true;
+    APP.examSubject = subjectName;
+    APP.examTimeRemaining = 120; // 2 minutes in seconds for demo
+    APP.examScore = null;
+    saveState();
+    showToast("Examen blanc démarré ! Concentrez-vous.", "success");
+    renderApp();
+}
+
+function startExamTimerLogic() {
+    if (examTimerInterval) return;
+    examTimerInterval = setInterval(() => {
+        if (APP.examTimeRemaining > 0 && APP.examSimulating) {
+            APP.examTimeRemaining--;
+            const timerEl = document.getElementById('exam-timer-countdown');
+            if (timerEl) {
+                const mins = Math.floor(APP.examTimeRemaining / 60);
+                const secs = APP.examTimeRemaining % 60;
+                timerEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+        } else {
+            clearInterval(examTimerInterval);
+            examTimerInterval = null;
+            if (APP.examSimulating) finishExamSimulation();
+        }
+    }, 1000);
+}
+
+function finishExamSimulation() {
+    clearInterval(examTimerInterval);
+    examTimerInterval = null;
+    APP.examSimulating = false;
+    APP.examScore = Math.floor(Math.random() * 5) + 15; // Simulated score: 15 to 19/20
+    saveState();
+    showToast("Temps écoulé ou examen soumis ! Correction IA en cours...", "success");
+    launchConfetti();
+    renderApp();
+}
+
+function renderExamensBlancsPage() {
+    const mins = Math.floor(APP.examTimeRemaining / 60);
+    const secs = APP.examTimeRemaining % 60;
+
+    return `
+    <div class="fade-in-up">
+        <div class="exam-simulation-bar">
+            <div>
+                <h2 style="font-weight:800;margin:0">Épreuve blanche de ${APP.examSubject}</h2>
+                <small style="opacity:0.9">Brevet des collèges · Mode chronométré</small>
+            </div>
+            <div class="exam-timer">
+                <i data-lucide="clock" style="width:24px;height:24px"></i>
+                <span id="exam-timer-countdown">${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}</span>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="card" style="padding:24px">
+                <h3 style="font-weight:700;margin-bottom:16px">Exercice 1 : Algorithme et géométrie (5 points)</h3>
+                <p style="margin-bottom:16px;line-height:1.6">On considère le programme de calcul suivant :</p>
+                <div style="background-color:var(--bg-primary);padding:16px;border-radius:var(--border-radius-md);margin-bottom:16px;font-family:monospace">
+                    - Choisir un nombre.<br>
+                    - Soustraire 3.<br>
+                    - Multiplier le résultat par le nombre de départ.
+                </div>
+                <p style="font-weight:600;margin-bottom:12px">Question : Si l'on choisit le nombre 5, quel résultat obtient-on ?</p>
+                <input type="text" class="chat-input-field" placeholder="Saisir votre réponse..." style="width:100%;margin-bottom:20px">
+                
+                <h3 style="font-weight:700;margin-top:24px;margin-bottom:16px">Exercice 2 : Fonctions (5 points)</h3>
+                <p style="margin-bottom:16px">Soit f la fonction définie par f(x) = 3x - 5. Quelle est l'image de 4 par cette fonction ?</p>
+                <input type="text" class="chat-input-field" placeholder="Saisir votre réponse..." style="width:100%">
+            </div>
+
+            <div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
+                <div>
+                    <div class="card-title"><i data-lucide="shield-alert" style="width:20px;height:20px;color:var(--color-warning)"></i> Consignes de l'examen</div>
+                    <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">
+                        - Ne rafraîchissez pas la page sous peine de perdre votre avancement.<br>
+                        - Vous pouvez soumettre à tout moment dès que vous avez terminé.<br>
+                        - À l'issue du temps, votre copie est envoyée pour correction automatique par l'IA FlexBot.
+                    </p>
+                </div>
+                <div style="display:flex;gap:12px;margin-top:20px">
+                    <button class="btn btn-secondary" onclick="showToast('Simulation en pause', 'warning')" style="flex:1">Pause</button>
+                    <button class="btn btn-primary" onclick="finishExamSimulation()" style="flex:1">Soumettre ma copie</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+// Overwrite the routing switcher to output the simulator if active
+const originalGetPageContent = getPageContent;
+getPageContent = function() {
+    if (APP.examSimulating) {
+        return renderExamensBlancsPage();
+    }
+    
+    // Result of simulation
+    if (APP.currentTab === 'examens' && APP.examScore !== null) {
+        const score = APP.examScore;
+        APP.examScore = null;
+        saveState();
+        return `
+        <div class="fade-in-up" style="text-align:center;padding:60px 0">
+            <div style="font-size:4rem;margin-bottom:20px">🏆</div>
+            <h1 style="font-size:2rem;font-weight:800;margin-bottom:12px">Résultat de l'examen blanc</h1>
+            <div style="font-size:3rem;font-weight:800;color:var(--color-success);margin-bottom:16px">${score}/20</div>
+            <p style="color:var(--text-secondary);max-width:500px;margin:0 auto 32px">Félicitations ! L'IA FlexBot a analysé ta copie et ton score montre une excellente maîtrise des fondamentaux.</p>
+            <div class="card" style="max-width:600px;margin:0 auto 32px;text-align:left;padding:24px">
+                <h4 style="font-weight:700;margin-bottom:8px">Analyse détaillée de FlexBot</h4>
+                <p style="font-size:0.95rem;line-height:1.6;color:var(--text-primary)">
+                    - <strong>Points forts :</strong> L'application de l'algorithme est parfaitement maîtrisée (Exercice 1).<br>
+                    - <strong>Axe de révision :</strong> Soigne la rédaction du calcul littéraire pour le calcul d'images (Exercice 2). Review la fiche "Les fonctions affines".
+                </p>
+            </div>
+            <button class="btn btn-primary" onclick="navigateTo('examens')">Retour aux examens</button>
+        </div>
+        `;
+    }
+
+    return originalGetPageContent();
+};
+
+// ─── AMÉLIORATION COMMUNAUTÉ AVEC BINÔME DE SOUTIEN ───────────────────────────
+const BUDDIES_DATA = [
+    { name: 'Arthur L.', bio: 'En classe de 3ème, passionné d\'informatique et d\'échecs. Fait l\'école à la maison en raison d\'un handicap.', tags: ['Code', 'SVT', 'Échecs'], match: '96% compatible' },
+    { name: 'Sarah G.', bio: 'Lycéenne (1ère Générale), adore la lecture et l\'anglais. Souffre de phobie scolaire.', tags: ['Littérature', 'Langues', 'Théâtre'], match: '92% compatible' },
+    { name: 'Nolan V.', bio: 'Passionné de SVT et d\'art. Rejoint EduFlex après des soucis de harcèlement.', tags: ['Dessin', 'Sciences', 'Musique'], match: '88% compatible' }
+];
+
+const originalRenderCommunautePage = renderCommunautePage;
+renderCommunautePage = function() {
+    const parentHtml = originalRenderCommunautePage();
+    return `
+    ${parentHtml}
+    
+    <div style="border-bottom: 2px solid var(--border-color); margin: 40px 0;"></div>
+
+    <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:12px">
+        <span style="display:inline-block;width:12px;height:24px;border-radius:4px;background:var(--color-primary)"></span>
+        Camarades de soutien
+    </h2>
+    <p style="color:var(--text-secondary);margin-bottom:24px">EduFlex te met en relation avec d'autres élèves partageant des profils, centres d'intérêt ou parcours similaires pour t'entraider sans aucune pression.</p>
+
+    <div class="matching-buddies-grid">
+        ${BUDDIES_DATA.map(b => `
+            <div class="buddy-card">
+                <div class="buddy-header">
+                    <div class="buddy-avatar-letters">${b.name.split(' ')[0][0]}${b.name.split(' ')[1] ? b.name.split(' ')[1][0] : ''}</div>
+                    <div>
+                        <strong style="font-size:1rem;color:var(--text-primary)">${b.name}</strong>
+                        <div class="buddy-badge">${b.match}</div>
+                    </div>
+                </div>
+                <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.5">${b.bio}</p>
+                <div class="buddy-tags">
+                    ${b.tags.map(t => `<span class="buddy-tag">${t}</span>`).join('')}
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="startBuddyDiscussion('${b.name}')">Démarrer un binôme d'entraide</button>
+            </div>
+        `).join('')}
+    </div>
+    `;
+};
+
+function startBuddyDiscussion(buddyName) {
+    showToast(`Binôme d'entraide demandé avec ${buddyName} ! 💙`, 'success');
+    navigateTo('messages');
+}
+
+// ─── PARENT DASHBOARD ET BILANS HEBDOMADAIRES ENRICHIS ─────────────────────────
+const originalRenderParentDashboard = renderParentDashboard;
+renderParentDashboard = function() {
+    return `
+    <div class="fade-in-up">
+        <div class="student-welcome-banner">
+            <div class="student-welcome-text">
+                <h2>Espace Parents EduFlex 👨‍👩‍👧</h2>
+                <p>Suivi de l'engagement scolaire et du bien-être de votre enfant.</p>
+            </div>
+        </div>
+
+        <div class="grid-3" style="margin-top:24px;margin-bottom:24px">
+            <div class="card" style="text-align:center;padding:20px">
+                <div style="font-size:2rem">😊</div>
+                <h4 style="font-weight:700;margin-top:8px">Humeur moyenne</h4>
+                <div style="font-size:1.5rem;font-weight:800;color:var(--color-success)">Bienveillant</div>
+            </div>
+            <div class="card" style="text-align:center;padding:20px">
+                <div style="font-size:2rem">📈</div>
+                <h4 style="font-weight:700;margin-top:8px">Cours consultés</h4>
+                <div style="font-size:1.5rem;font-weight:800;color:var(--color-primary)">16 leçons / sem</div>
+            </div>
+            <div class="card" style="text-align:center;padding:20px">
+                <div style="font-size:2rem">🎯</div>
+                <h4 style="font-weight:700;margin-top:8px">Validation Quiz</h4>
+                <div style="font-size:1.5rem;font-weight:800;color:var(--color-warning)">85% Réussite</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom:24px">
+            <div class="card-title"><i data-lucide="bar-chart-3" style="width:20px;height:20px;color:var(--color-primary)"></i> Bilan hebdomadaire généré par l'IA</div>
+            <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">
+                <strong>Synthèse de la semaine :</strong> Votre enfant s'est montré particulièrement motivé et impliqué. Il a validé 3 fiches de cours supplémentaires et obtenu 3/3 au quiz d'évaluation en mathématiques.
+            </p>
+            <div style="background-color:var(--color-primary-light);padding:16px;border-radius:var(--border-radius-md);margin-top:16px;border-left:4px solid var(--color-primary)">
+                💡 <strong>Conseil IA :</strong> Encouragez-le à persévérer et à s'accorder des temps de repos. Son niveau de stress est stable (2/5).
+            </div>
+        </div>
+
+        <div class="parent-charts-grid">
+            <div class="card">
+                <div class="card-title"><i data-lucide="line-chart" style="width:20px;height:20px;color:var(--color-success)"></i> Détail par compétences</div>
+                ${[
+                    { name: 'Compréhension de notions', val: 90 },
+                    { name: 'Autonomie de travail', val: 80 },
+                    { name: 'Participation aux lives', val: 100 },
+                    { name: 'Gestion des émotions', val: 75 }
+                ].map(c => `
+                    <div style="margin-bottom:12px">
+                        <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:600;margin-bottom:4px">
+                            <span>${c.name}</span><span>${c.val}%</span>
+                        </div>
+                        <div class="progress-container"><div class="progress-fill" style="width:${c.val}%"></div></div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
+                <div>
+                    <div class="card-title"><i data-lucide="mail" style="width:20px;height:20px;color:var(--color-warning)"></i> Contacter un enseignant</div>
+                    <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.5">Un tuteur référent répond à toutes vos questions concernant le parcours et l'orientation de votre enfant.</p>
+                </div>
+                <button class="btn btn-primary" onclick="navigateTo('messages')">Accéder à la messagerie</button>
+            </div>
+        </div>
+    </div>
+    `;
+};
+
+// ─── AMÉLIORATION DU DASHBOARD ENSEIGNANT ───────────────────────────────────────
+const originalRenderTeacherDashboard = renderTeacherDashboard;
+renderTeacherDashboard = function() {
+    return `
+    <div class="fade-in-up">
+        <div class="student-welcome-banner">
+            <div class="student-welcome-text">
+                <h2>Espace Enseignant 📚</h2>
+                <p>Gestion de vos groupes de tutorat et validation des activités.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-quick-stats">
+            ${[
+                { icon: 'users', value: '18', label: 'Élèves assignés', color: 'blue' },
+                { icon: 'file-text', value: '4', label: 'Devoirs en attente', color: 'orange' },
+                { icon: 'trending-up', value: '92%', label: 'Taux de participation', color: 'green' }
+            ].map(s => `
+                <div class="quick-stat-card">
+                    <div class="stat-icon-wrapper ${s.color}"><i data-lucide="${s.icon}" style="width:24px;height:24px"></i></div>
+                    <div><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>
+                </div>
+            `).join('')}
+        </div>
+
+        <div class="grid-2" style="margin-top:24px">
+            <div class="card">
+                <div class="card-title"><i data-lucide="bell" style="width:20px;height:20px;color:var(--color-danger)"></i> Suivi des élèves prioritaires</div>
+                <div style="display:flex; flex-direction:column; gap:12px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--border-color);border-radius:var(--border-radius-md)">
+                        <div>
+                            <strong>Lucas Moreau</strong><br>
+                            <small style="color:var(--text-secondary)">Dernière activité : Il y a 3 jours (Alerte stress)</small>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="navigateTo('messages')">Contacter</button>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--border-color);border-radius:var(--border-radius-md)">
+                        <div>
+                            <strong>Thomas Dupont</strong><br>
+                            <small style="color:var(--text-secondary)">Difficultés signalées en géométrie</small>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="showToast('Ressource envoyée', 'success')">Envoyer ressource</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i data-lucide="plus" style="width:20px;height:20px;color:var(--color-primary)"></i> Actions pédagogiques</div>
+                <div style="display:flex; flex-direction:column; gap:10px">
+                    <button class="btn btn-secondary" onclick="navigateTo('contenus')"><i data-lucide="file-text" style="width:16px;height:16px;margin-right:6px"></i> Publier un nouveau cours</button>
+                    <button class="btn btn-secondary" onclick="navigateTo('planning')"><i data-lucide="calendar" style="width:16px;height:16px;margin-right:6px"></i> Planifier un cours en direct</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+};
+
+// ─── ESPACE ADMINISTRATEUR ───────────────────────────────────────────────────
+const originalRenderAdminDashboard = renderAdminDashboard;
+renderAdminDashboard = function() {
+    return `
+    <div class="fade-in-up">
+        <div class="student-welcome-banner">
+            <div class="student-welcome-text">
+                <h2>Console d'Administration EduFlex ⚙️</h2>
+                <p>Supervisez l'audience générale et gérez la modération de la plateforme.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-quick-stats" style="margin-top:24px">
+            ${[
+                { icon: 'activity', value: '12 840', label: 'Requêtes FlexBot', color: 'blue' },
+                { icon: 'shield', value: '0', label: 'Signalement en attente', color: 'green' },
+                { icon: 'credit-card', value: '97 800 €', label: 'Chiffre d\'affaires', color: 'orange' }
+            ].map(s => `
+                <div class="quick-stat-card">
+                    <div class="stat-icon-wrapper ${s.color}"><i data-lucide="${s.icon}" style="width:24px;height:24px"></i></div>
+                    <div><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>
+                </div>
+            `).join('')}
+        </div>
+
+        <div class="grid-2" style="margin-top:24px">
+            <div class="card">
+                <div class="card-title"><i data-lucide="users" style="width:20px;height:20px;color:var(--color-primary)"></i> Activité système</div>
+                <div style="display:flex; flex-direction:column; gap:10px">
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem">
+                        <span>Serveurs de streaming (Lives)</span>
+                        <span style="color:var(--color-success);font-weight:700">🟢 Opérationnel</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem">
+                        <span>API FlexBot (IA Pédagogique)</span>
+                        <span style="color:var(--color-success);font-weight:700">🟢 Opérationnel</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.9rem">
+                        <span>Base de données utilisateurs</span>
+                        <span style="color:var(--color-success);font-weight:700">🟢 Opérationnel</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><i data-lucide="shield-alert" style="width:20px;height:20px;color:var(--color-warning)"></i> Administration rapide</div>
+                <div style="display:flex; flex-direction:column; gap:10px">
+                    <button class="btn btn-secondary" onclick="navigateTo('utilisateurs')">Gérer les comptes</button>
+                    <button class="btn btn-secondary" onclick="navigateTo('configuration')">Configuration de modération</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+};
+
+// ─── AMÉLIORATION DU PIED DE PAGE LANDING PAGE & GLOBAL ───────────────────────
+const originalRenderLandingPage = renderLandingPage;
+renderRenderLandingPage = function() {
+    const parentHtml = originalRenderLandingPage();
+    return `
+    ${parentHtml}
+    
+    <footer class="footer-professional">
+        <div class="footer-content">
+            <div class="footer-column">
+                <div class="sidebar-logo" style="margin-bottom: 16px; padding:0">
+                    <img src="Logo.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
+                    <span class="logo-text">EduFlex</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+                    EduFlex réconcilie les élèves aux parcours de vie complexes avec la réussite scolaire dans un cadre apaisant et personnalisé.
+                </p>
+                <div style="font-weight:700;font-size:0.9rem;color:var(--color-danger)">
+                    📞 Urgence Bien-être : Composez le 3114 (Gratuit 24/7)
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h4>Plateforme</h4>
+                <ul>
+                    <li><a href="#" onclick="navigateTo('accueil'); return false;">Accueil</a></li>
+                    <li><a href="#" onclick="navigateTo('inscription'); return false;">S'inscrire</a></li>
+                    <li><a href="#" onclick="navigateTo('connexion'); return false;">Se connecter</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4>Légal & Sécurité</h4>
+                <ul>
+                    <li><a href="#" onclick="showToast('Affichage des mentions légales', 'primary'); return false;">Mentions Légales</a></li>
+                    <li><a href="#" onclick="showToast('Affichage du RGPD', 'primary'); return false;">Politique de Confidentialité</a></li>
+                    <li><a href="#" onclick="showToast('Charte RGPD EduFlex', 'primary'); return false;">Conformité RGPD</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h4>Accessibilité</h4>
+                <ul>
+                    <li><span style="font-size:0.85rem;color:var(--text-secondary)">Norme : RGAA Conforme</span></li>
+                    <li><span style="font-size:0.85rem;color:var(--text-secondary)">Sous-titres & TTS inclus</span></li>
+                    <li><span style="font-size:0.85rem;color:var(--text-secondary)">Optimisé dyslexie</span></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <span>© 2026 EduFlex SAS. Tous droits réservés.</span>
+            <div style="display:flex; gap:16px">
+                <a href="#" onclick="showToast('Réseaux sociaux', 'primary'); return false;"><i data-lucide="twitter" style="width:18px;height:18px"></i></a>
+                <a href="#" onclick="showToast('Réseaux sociaux', 'primary'); return false;"><i data-lucide="instagram" style="width:18px;height:18px"></i></a>
+                <a href="#" onclick="showToast('Réseaux sociaux', 'primary'); return false;"><i data-lucide="linkedin" style="width:18px;height:18px"></i></a>
+            </div>
+        </div>
+    </footer>
+    `;
+};
+
+// Override public route selector for rendering public landing footer
+const originalGetPageContentPublic = getPageContent;
+getPageContent = function() {
+    const parentVal = originalGetPageContent();
+    if (APP.role === 'visitor' && APP.currentTab === 'accueil') {
+        return renderRenderLandingPage();
+    }
+    return parentVal;
+};
+
 // ─── MAIN RENDER ─────────────────────────────────────────────────────────────
+
 function renderApp() {
     // Apply stored preferences
     document.documentElement.setAttribute('data-theme', APP.theme);
@@ -2087,6 +2895,32 @@ function renderApp() {
 
     // Initialize whiteboard if on that page
     if (APP.currentTab === 'whiteboard') setTimeout(initWhiteboard, 100);
+    // Initialize exam timer if simulating
+    if (APP.examSimulating) startExamTimerLogic();
+    // Bind search event listener
+    const searchInput = document.getElementById('global-search');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim().toLowerCase();
+                if (query) {
+                    if (query.includes('math') || query.includes('affine')) {
+                        selectSubject('Mathématiques'); navigateTo('cours');
+                    } else if (query.includes('franc') || query.includes('style')) {
+                        selectSubject('Français'); navigateTo('cours');
+                    } else if (query.includes('hist') || query.includes('guer')) {
+                        selectSubject('Histoire-Géo'); navigateTo('cours');
+                    } else if (query.includes('svt') || query.includes('mitose') || query.includes('adn')) {
+                        selectSubject('SVT'); navigateTo('cours');
+                    } else {
+                        showToast(`Recherche pour "${query}"... Aucun résultat exact, redirection vers vos cours.`, 'warning');
+                        navigateTo('cours');
+                    }
+                    searchInput.value = '';
+                }
+            }
+        });
+    }
 }
 
 // ─── ACTIVE ROLE BUTTON STYLING ──────────────────────────────────────────────
@@ -2094,8 +2928,11 @@ const style = document.createElement('style');
 style.textContent = `
     .active-role {
         background-color: var(--color-primary) !important;
-        color: white !important;
+        color: var(--text-on-primary, white) !important;
         border-color: var(--color-primary) !important;
+    }
+    html[data-theme="high-contrast"] .active-role {
+        color: #000000 !important;
     }
 `;
 document.head.appendChild(style);
