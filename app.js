@@ -197,7 +197,7 @@ function renderSidebar() {
 
     sidebar.innerHTML = `
         <div class="sidebar-logo">
-            <div class="logo-icon"><i data-lucide="graduation-cap" style="width:22px;height:22px"></i></div>
+            <img src="Logo.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
             <span class="logo-text">EduFlex</span>
         </div>
         <ul class="nav-links">
@@ -231,7 +231,7 @@ function renderHeader() {
     if (APP.role === 'visitor') {
         header.innerHTML = `
             <div class="sidebar-logo" style="cursor:pointer" onclick="navigateTo('accueil')">
-                <div class="logo-icon"><i data-lucide="graduation-cap" style="width:22px;height:22px"></i></div>
+                <img src="Logo.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
                 <span class="logo-text">EduFlex</span>
             </div>
             <div class="header-actions">
@@ -357,7 +357,7 @@ function renderLandingPage() {
             </div>
             <div class="hero-image-container">
                 <div class="hero-img-mock" style="height:320px;background:linear-gradient(135deg, #eff6ff 0%, #ecfdf5 50%, #fffbeb 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
-                    <i data-lucide="graduation-cap" style="width:80px;height:80px;color:var(--color-primary);opacity:0.6"></i>
+                    <img src="Logo.png" alt="EduFlex" style="width:160px;height:160px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(59,130,246,0.25))">
                     <span style="font-weight:700;font-size:1.4rem;color:var(--color-primary)">EduFlex</span>
                     <span style="color:var(--text-secondary);font-size:0.9rem">Plateforme éducative hybride</span>
                 </div>
