@@ -130,6 +130,7 @@ function loginAs(role, username) {
     renderApp();
 }
 
+// ─── LOGOUT FUNCTION ─────────────────────────────────────────────────────────
 function logout() {
     APP.role = 'visitor';
     APP.username = '';
@@ -323,7 +324,7 @@ function sendChatMessage() {
         "Je suis là pour t'aider ! 💪 N'hésite pas à me poser d'autres questions.",
         "Voici un conseil : essaie de diviser le problème en petites étapes. Ça te semblera beaucoup plus simple ! 🎯",
         "Bonne approche ! Continue comme ça, tu es sur la bonne voie ! 🌟",
-        "Je comprends que ça puisse sembler compliqué. Prends une pause et reviens-y ensuite, tu verras la différence ! ☕"
+        "Je comprends que ça puisse sembler compliqué. Prends une passe et reviens-y ensuite, tu verras la différence ! ☕"
     ];
     setTimeout(() => {
         const botResp = responses[Math.floor(Math.random() * responses.length)];
@@ -912,8 +913,8 @@ function joinLiveStream(url) {
 function renderLivePage() {
     let playerHtml = '';
     if (currentActiveLiveUrl) {
-        // ID de la vidéo extrait : uV_EmbYu9_E
-        const embedUrl = "https://www.youtube.com/embed/uV_EmbYu9_E?start=12&autoplay=1";
+        // Utilisation de youtube-nocookie.com pour éviter les blocages de cookies d'intégration
+        const embedUrl = "https://www.youtube-nocookie.com/embed/uV_EmbYu9_E?start=12&autoplay=1";
         playerHtml = `
             <div class="card" style="margin-bottom: 32px; padding: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -921,9 +922,14 @@ function renderLivePage() {
                         <i data-lucide="video" style="width:20px;height:20px;color:var(--color-danger);animation:pulseBorder 2s infinite"></i> 
                         Cours en Direct : Résolution d'équations (Maths)
                     </div>
-                    <button class="btn btn-secondary btn-sm" onclick="closeLiveStream()">
-                        <i data-lucide="x" style="width:16px;height:16px"></i> Fermer le Live
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="https://youtu.be/uV_EmbYu9_E?si=RHe_zoPk6W13c3DU&t=12" target="_blank" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center;">
+                            <i data-lucide="external-link" style="width:14px;height:14px;margin-right:5px"></i> Ouvrir sur YouTube
+                        </a>
+                        <button class="btn btn-secondary btn-sm" onclick="closeLiveStream()">
+                            <i data-lucide="x" style="width:16px;height:16px"></i> Fermer
+                        </button>
+                    </div>
                 </div>
                 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: var(--border-radius-md); box-shadow: var(--shadow-md); background: #000;">
                     <iframe 
@@ -934,6 +940,9 @@ function renderLivePage() {
                         allowfullscreen>
                     </iframe>
                 </div>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+                    💡 Si la vidéo indique une erreur, cliquez sur "Ouvrir sur YouTube" ci-dessus pour la regarder directement.
+                </p>
             </div>
         `;
     }
@@ -947,13 +956,13 @@ function renderLivePage() {
 
         <div class="live-sessions-catalog">
             ${[
-                { subject: 'Maths', title: 'Résolution d\'équations', teacher: 'M. Martin', time: 'Aujourd\'hui 10:30', live: true, gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', url: 'https://youtu.be/uV_EmbYu9_E?si=RHe_zoPk6W13c3DU&t=12' },
-                { subject: 'Français', title: 'Commentaire de texte', teacher: 'Mme Dubois', time: 'Demain 14:00', live: false, gradient: 'linear-gradient(135deg, #10b981, #059669)', url: null },
-                { subject: 'Histoire', title: 'La Révolution française', teacher: 'M. Leroy', time: 'Mercredi 09:00', live: false, gradient: 'linear-gradient(135deg, #f59e0b, #d97706)', url: null },
-                { subject: 'Anglais', title: 'Oral Practice', teacher: 'Mrs. Smith', time: 'Jeudi 11:00', live: false, gradient: 'linear-gradient(135deg, #ec4899, #db2777)', url: null },
-                { subject: 'SVT', title: 'La photosynthèse', teacher: 'Mme Garcia', time: 'Vendredi 10:00', live: false, gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', url: null },
-                { subject: 'Physique', title: 'Les forces en mécanique', teacher: 'M. Bernard', time: 'Vendredi 14:00', live: false, gradient: 'linear-gradient(135deg, #14b8a6, #0d9488)', url: null }
-            ].map(s => `
+            { subject: 'Maths', title: 'Résolution d\'équations', teacher: 'M. Martin', time: 'Aujourd\'hui 10:30', live: true, gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', url: 'https://youtu.be/uV_EmbYu9_E?si=RHe_zoPk6W13c3DU&t=12' },
+            { subject: 'Français', title: 'Commentaire de texte', teacher: 'Mme Dubois', time: 'Demain 14:00', live: false, gradient: 'linear-gradient(135deg, #10b981, #059669)', url: null },
+            { subject: 'Histoire', title: 'La Révolution française', teacher: 'M. Leroy', time: 'Mercredi 09:00', live: false, gradient: 'linear-gradient(135deg, #f59e0b, #d97706)', url: null },
+            { subject: 'Anglais', title: 'Oral Practice', teacher: 'Mrs. Smith', time: 'Jeudi 11:00', live: false, gradient: 'linear-gradient(135deg, #ec4899, #db2777)', url: null },
+            { subject: 'SVT', title: 'La photosynthèse', teacher: 'Mme Garcia', time: 'Vendredi 10:00', live: false, gradient: 'linear-gradient(135deg, #8b5cf6, #7c3aed)', url: null },
+            { subject: 'Physique', title: 'Les forces en mécanique', teacher: 'M. Bernard', time: 'Vendredi 14:00', live: false, gradient: 'linear-gradient(135deg, #14b8a6, #0d9488)', url: null }
+        ].map(s => `
                 <div class="live-card">
                     <div class="live-card-banner" style="background:${s.gradient}">
                         <div style="display:flex;justify-content:space-between;align-items:center">
@@ -1427,17 +1436,435 @@ function getPageContent() {
         case 'bienetre': return renderBienEtrePage();
         case 'whiteboard': return renderWhiteboardPage();
         // Parent pages
-        case 'suivi': return renderPlaceholderPage('Suivi Enfant', 'bar-chart-3', 'Visualisez en détail la progression et les statistiques de votre enfant.');
-        case 'messages': return renderPlaceholderPage('Messages', 'mail', 'Échangez avec les enseignants et l\'équipe pédagogique.');
-        case 'facturation': return renderPlaceholderPage('Facturation', 'credit-card', 'Gérez vos abonnements et consultez vos factures.');
+        case 'suivi': return renderParentSuivi();
+        case 'messages': return renderParentMessages();
+        case 'facturation': return renderParentFacturation();
         // Teacher pages
-        case 'mes-eleves': return renderPlaceholderPage('Mes Élèves', 'users', 'Suivez la progression de chacun de vos élèves.');
-        case 'contenus': return renderPlaceholderPage('Contenus', 'file-text', 'Créez et gérez vos cours, exercices et évaluations.');
-        case 'planning': return renderPlaceholderPage('Planning', 'calendar', 'Organisez vos sessions live et rendez-vous.');
+        case 'mes-eleves': return renderTeacherStudents();
+        case 'contenus': return renderTeacherContenus();
+        case 'planning': return renderTeacherPlanning();
         // Admin pages
-        case 'utilisateurs': return renderPlaceholderPage('Utilisateurs', 'users', 'Gérez les comptes utilisateurs de la plateforme.');
-        case 'statistiques': return renderPlaceholderPage('Statistiques', 'bar-chart-3', 'Consultez les métriques et indicateurs de la plateforme.');
-        case 'configuration': return renderPlaceholderPage('Configuration', 'settings', 'Paramètres généraux de la plateforme EduFlex.');
+        case 'utilisateurs': return renderAdminUsers();
+        case 'statistiques': return renderAdminStats();
+        case 'configuration': return renderAdminConfig();
+        default:
+            APP.currentTab = 'dashboard';
+            return getPageContent();
+    }
+}
+
+// ─── SUB-PAGES RENDERING : PARENT ────────────────────────────────────────────
+function renderParentSuivi() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Suivi de l'enfant</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Consultez les notes, l'assiduité et la progression détaillée de votre enfant.</p>
+        
+        <div class="grid-2" style="margin-bottom: 24px;">
+            <div class="card">
+                <div class="card-title"><i data-lucide="line-chart" style="width:20px;height:20px;color:var(--color-primary)"></i> Moyennes trimestrielles</div>
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                    ${[
+                        { subject: 'Mathématiques', avg: '16.5/20', desc: 'Excellente progression', color: 'blue' },
+                        { subject: 'Français', avg: '14.0/20', desc: 'Travail régulier et sérieux', color: 'green' },
+                        { subject: 'Histoire-Géo', avg: '17.5/20', desc: 'Élève très impliqué', color: 'orange' },
+                        { subject: 'SVT', avg: '12.0/20', desc: 'Des efforts à poursuivre', color: 'purple' }
+                    ].map(s => `
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong style="font-size:0.95rem;">${s.subject}</strong>
+                                <div style="font-size:0.8rem; color:var(--text-secondary);">${s.desc}</div>
+                            </div>
+                            <span class="badge badge-primary" style="font-size:0.9rem; padding: 6px 12px;">${s.avg}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title"><i data-lucide="check-circle" style="width:20px;height:20px;color:var(--color-success)"></i> Assiduité et Participation</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; text-align:center; padding: 16px 0;">
+                    <div style="padding: 16px; background-color: var(--bg-primary); border-radius: var(--border-radius-md);">
+                        <div style="font-size: 2.2rem; font-weight:800; color: var(--color-success);">100%</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top:4px;">Présence aux Lives</div>
+                    </div>
+                    <div style="padding: 16px; background-color: var(--bg-primary); border-radius: var(--border-radius-md);">
+                        <div style="font-size: 2.2rem; font-weight:800; color: var(--color-primary);">12 / 12</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top:4px;">Devoirs rendus</div>
+                    </div>
+                </div>
+                <div class="report-card-text" style="margin-top: 10px;">
+                    💡 <strong>Observation du tuteur :</strong> Votre enfant se connecte régulièrement et montre un grand intérêt pour les sessions live du matin.
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function renderParentMessages() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Messagerie parents-tuteurs</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Échangez à tout moment avec les tuteurs et enseignants d'EduFlex.</p>
+        
+        <div class="ia-chat-interface" style="height: 500px;">
+            <div class="ia-chat-header">
+                <div class="ia-chat-botinfo">
+                    <div style="width:40px;height:40px;border-radius:50%;background:var(--color-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;">MM</div>
+                    <div>
+                        <strong>M. Martin (Tuteur Principal)</strong>
+                        <div style="font-size:0.75rem;color:var(--text-secondary);">Enseignant de Mathématiques</div>
+                    </div>
+                </div>
+            </div>
+            <div class="ia-messages-container" id="parent-chat-messages">
+                <div class="chat-bubble-wrapper ia">
+                    <div style="width:32px;height:32px;border-radius:50%;background:var(--border-color);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;">MM</div>
+                    <div class="chat-bubble">Bonjour. Votre enfant a fait d'excellents progrès cette semaine sur les équations de premier degré. N'hésitez pas à me faire part de toute difficulté observée à la maison.</div>
+                </div>
+            </div>
+            <div class="chat-input-bar">
+                <input type="text" class="chat-input-field" placeholder="Écrire un message..." id="parent-chat-input" onkeydown="if(event.key==='Enter') sendParentChatMessage()">
+                <button class="btn btn-primary btn-sm" onclick="sendParentChatMessage()"><i data-lucide="send" style="width:16px;height:16px"></i></button>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function sendParentChatMessage() {
+    const input = document.getElementById('parent-chat-input');
+    const container = document.getElementById('parent-chat-messages');
+    if (!input || !input.value.trim()) return;
+    const msg = input.value.trim();
+    input.value = '';
+    container.innerHTML += `
+        <div class="chat-bubble-wrapper student">
+            <div class="chat-bubble" style="background-color: var(--color-success);">${msg}</div>
+        </div>
+    `;
+    container.scrollTop = container.scrollHeight;
+    setTimeout(() => {
+        container.innerHTML += `
+            <div class="chat-bubble-wrapper ia">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--border-color);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;">MM</div>
+                <div class="chat-bubble">Bien reçu ! Merci pour votre retour, j'en prends note pour le prochain live. 👍</div>
+            </div>
+        `;
+        container.scrollTop = container.scrollHeight;
+        lucide.createIcons({ nodes: [container] });
+    }, 1000);
+}
+
+function renderParentFacturation() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Facturation et Abonnements</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Gérez votre abonnement EduFlex et téléchargez vos reçus.</p>
+        
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i data-lucide="credit-card" style="width:20px;height:20px;color:var(--color-primary)"></i> Formule Actuelle</div>
+                <div style="margin-bottom:16px;">
+                    <span class="badge badge-success" style="font-size:0.85rem;margin-bottom:8px;">Formule Accompagnée</span>
+                    <div style="font-size:1.8rem;font-weight:800;margin:8px 0;">67 € / mois</div>
+                    <p style="font-size:0.9rem;color:var(--text-secondary);">Prochain prélèvement le 15 Juin 2026</p>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-secondary btn-sm" onclick="showToast('Option de modification d\'abonnement', 'primary')">Modifier la formule</button>
+                    <button class="btn btn-secondary btn-sm" onclick="showToast('Abonnement suspendu avec succès', 'danger')" style="color:var(--color-danger); border-color:var(--color-danger);">Suspendre</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title"><i data-lucide="file-text" style="width:20px;height:20px;color:var(--color-success)"></i> Historique de Facturation</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    ${[
+                        { date: '15 Mai 2026', amount: '67.00 €', id: 'FACT-002' },
+                        { date: '15 Avril 2026', amount: '67.00 €', id: 'FACT-001' }
+                    ].map(f => `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border:1px solid var(--border-color); border-radius: var(--border-radius-md);">
+                            <div>
+                                <strong style="font-size:0.9rem;">${f.id}</strong>
+                                <div style="font-size:0.75rem; color:var(--text-secondary);">${f.date}</div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span>${f.amount}</span>
+                                <button class="icon-btn" onclick="showToast('Téléchargement de la facture...', 'success')" style="width:32px; height:32px;"><i data-lucide="download" style="width:14px;height:14px"></i></button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+// ─── SUB-PAGES RENDERING : TEACHER ───────────────────────────────────────────
+function renderTeacherStudents() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Suivi des élèves</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Consultez l'engagement et l'état psychopédagogique de vos élèves.</p>
+        
+        <div class="teacher-inbox-preview" style="display:flex; flex-direction:column; gap:12px;">
+            ${[
+                { name: 'Léa Martin', alert: 'Tout va bien', status: 'En ligne', mood: '😄', mathAvg: '16/20', lastActive: 'Il y a 5 min' },
+                { name: 'Lucas Moreau', alert: 'Alerte bien-être : stress élevé', status: 'Hors ligne', mood: '😟', mathAvg: '11/20', lastActive: 'Il y a 3 heures' },
+                { name: 'Thomas Dupont', alert: 'Tout va bien', status: 'En ligne', mood: '😐', mathAvg: '13/20', lastActive: 'Il y a 10 min' },
+                { name: 'Inès Boucher', alert: 'Tout va bien', status: 'En ligne', mood: '🙂', mathAvg: '15/20', lastActive: 'Il y a 2 min' }
+            ].map(s => `
+                <div class="teacher-student-row" style="padding: 20px;">
+                    <div style="display:flex; align-items:center; gap:16px; flex: 1.2;">
+                        <div style="width:44px; height:44px; border-radius:50%; background:var(--color-primary-light); color:var(--color-primary); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1rem;">
+                            ${s.name.charAt(0)}
+                        </div>
+                        <div>
+                            <strong style="font-size:1rem;">${s.name}</strong>
+                            <div style="font-size:0.8rem; color:var(--text-secondary);">Dernière connexion : ${s.lastActive}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:24px; flex: 1.8; justify-content:flex-end; flex-wrap:wrap;">
+                        <div style="text-align:right;">
+                            <span style="font-size:1.2rem; margin-right:8px;">${s.mood}</span>
+                            <span class="badge ${s.alert.includes('Alerte') ? 'badge-danger' : 'badge-success'}">${s.alert}</span>
+                        </div>
+                        <div>
+                            Moyenne : <strong style="color:var(--color-primary);">${s.mathAvg}</strong>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="navigateTo('messages')">
+                            <i data-lucide="mail" style="width:14px;height:14px;margin-right:5px"></i> Contacter
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+    `;
+}
+
+function renderTeacherContenus() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Gestion des contenus</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Publiez de nouveaux cours et concevez des quiz interactifs.</p>
+        
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i data-lucide="plus" style="width:20px;height:20px;color:var(--color-primary)"></i> Créer une ressource</div>
+                <form onsubmit="event.preventDefault(); showToast('Ressource pédagogique créée avec succès ! 🎉', 'success');" style="display:flex; flex-direction:column; gap:16px;">
+                    <div>
+                        <label style="font-weight:600; font-size:0.9rem; display:block; margin-bottom:6px;">Titre de la ressource</label>
+                        <input type="text" class="chat-input-field" placeholder="Ex: Les fractions décimales" required style="width:100%;">
+                    </div>
+                    <div>
+                        <label style="font-weight:600; font-size:0.9rem; display:block; margin-bottom:6px;">Matière</label>
+                        <select class="chat-input-field" style="width:100%; height:48px;">
+                            <option>Mathématiques</option>
+                            <option>Français</option>
+                            <option>Histoire-Géographie</option>
+                            <option>SVT</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Publier le contenu</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <div class="card-title"><i data-lucide="file-text" style="width:20px;height:20px;color:var(--color-success)"></i> Ressources publiées</div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    ${[
+                        { title: 'Fonctions affines (Vidéo + Quiz)', subject: 'Mathématiques', status: 'Publié' },
+                        { title: 'Analyse du commentaire littéraire', subject: 'Français', status: 'Brouillon' }
+                    ].map(r => `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--border-color); border-radius: var(--border-radius-md);">
+                            <div>
+                                <strong style="font-size:0.9rem;">${r.title}</strong>
+                                <div style="font-size:0.75rem; color:var(--text-secondary);">${r.subject}</div>
+                            </div>
+                            <span class="badge ${r.status === 'Publié' ? 'badge-success' : 'badge-warning'}">${r.status}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function renderTeacherPlanning() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Emploi du temps & Sessions live</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Gérez vos créneaux de tutorat et vos cours en direct.</p>
+        
+        <div class="card">
+            <div class="card-title"><i data-lucide="calendar" style="width:20px;height:20px;color:var(--color-primary)"></i> Mon Planning de la semaine</div>
+            <div style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
+                ${[
+                    { date: 'Lundi - 10:30', title: 'Cours en Direct - Fonctions affines', type: 'live' },
+                    { date: 'Mardi - 14:00', title: 'Tutorat Individuel - Léa Martin', type: 'tutorat' },
+                    { date: 'Jeudi - 16:00', title: 'Réunion d\'équipe pédagogique', type: 'admin' }
+                ].map(p => `
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:14px; border:1px solid var(--border-color); border-radius: var(--border-radius-md);">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span class="status-indicator ${p.type === 'live' ? 'status-danger' : p.type === 'tutorat' ? 'status-active' : 'status-pending'}"></span>
+                            <div>
+                                <strong style="font-size:0.95rem;">${p.title}</strong>
+                                <div style="font-size:0.8rem; color:var(--text-secondary);">${p.date}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="showToast('Session prête', 'success')">Démarrer</button>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+// ─── SUB-PAGES RENDERING : ADMIN ─────────────────────────────────────────────
+function renderAdminUsers() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Gestion des comptes</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Activez, modifiez ou supprimez les comptes des utilisateurs de la plateforme.</p>
+        
+        <div class="card">
+            <div class="card-title"><i data-lucide="users" style="width:20px;height:20px;color:var(--color-primary)"></i> En attente de validation</div>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                ${[
+                    { name: 'Mme Durand', email: 'durand.tuteur@eduflex.fr', role: 'Enseignant' },
+                    { name: 'Arthur Dupuis', email: 'arthur.dupuis@gmail.com', role: 'Élève' }
+                ].map(u => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:14px; border:1px solid var(--border-color); border-radius: var(--border-radius-md);">
+                        <div>
+                            <strong style="font-size:0.95rem;">${u.name}</strong> (${u.role})
+                            <div style="font-size:0.8rem; color:var(--text-secondary);">${u.email}</div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-success btn-sm" onclick="showToast('Compte validé avec succès !', 'success')">Valider</button>
+                            <button class="btn btn-secondary btn-sm" onclick="showToast('Demande rejetée', 'warning')" style="color:var(--color-danger); border-color:var(--color-danger);">Refuser</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function renderAdminStats() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Statistiques d'audience</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Visualisez l'état global et l'utilisation de la plateforme EduFlex.</p>
+        
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title"><i data-lucide="activity" style="width:20px;height:20px;color:var(--color-primary)"></i> Engagement quotidien</div>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    ${[
+                        { label: 'Connexions d\'élèves uniques', val: '645', pct: 92 },
+                        { label: 'Utilisation de l\'IA FlexBot', val: '2 840 requêtes', pct: 85 },
+                        { label: 'Heures cumulées en live', val: '124 heures', pct: 78 }
+                    ].map(s => `
+                        <div>
+                            <div style="display:flex; justify-content:space-between; font-size:0.9rem; font-weight:600; margin-bottom:4px;">
+                                <span>${s.label}</span><span>${s.val}</span>
+                            </div>
+                            <div class="progress-container"><div class="progress-fill" style="width:${s.pct}%"></div></div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title"><i data-lucide="pie-chart" style="width:20px;height:20px;color:var(--color-success)"></i> Taux de complétion des cours</div>
+                <div style="text-align:center; padding:24px;">
+                    <div style="font-size:3rem; font-weight:800; color:var(--color-success);">87.4%</div>
+                    <p style="color:var(--text-secondary); margin:8px 0;">des cours commencés sont terminés</p>
+                    <span class="badge badge-success">+4.2% ce mois-ci</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+function renderAdminConfig() {
+    return `
+    <div class="fade-in-up">
+        <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Configuration globale</h1>
+        <p style="color:var(--text-secondary);margin-bottom:24px">Ajustez la sécurité, la modération de l'IA et les clés d'accès.</p>
+        
+        <div class="card" style="max-width:600px;">
+            <div class="card-title"><i data-lucide="shield" style="width:20px;height:20px;color:var(--color-primary)"></i> Paramètres de Modération active</div>
+            <form onsubmit="event.preventDefault(); showToast('Configuration sauvegardée ! ⚙️', 'success');" style="display:flex; flex-direction:column; gap:16px; margin-top:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong style="font-size:0.95rem; display:block;">Modération automatique IA</strong>
+                        <small style="color:var(--text-secondary);">Filtrage instantané des contenus injurieux.</small>
+                    </div>
+                    <input type="checkbox" checked style="width:20px; height:20px; cursor:pointer;">
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong style="font-size:0.95rem; display:block;">Alertes bien-être sensibles</strong>
+                        <small style="color:var(--text-secondary);">Alerter les tuteurs en cas de mots-clés liés au stress extrême.</small>
+                    </div>
+                    <input type="checkbox" checked style="width:20px; height:20px; cursor:pointer;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top:10px;">Enregistrer les paramètres</button>
+            </form>
+        </div>
+    </div>
+    `;
+}
+
+// ─── MAIN ROUTER ─────────────────────────────────────────────────────────────
+function getPageContent() {
+    // If visitor, only show public pages
+    if (APP.role === 'visitor') {
+        switch (APP.currentTab) {
+            case 'connexion': return renderLoginPage();
+            case 'inscription': return renderRegisterPage();
+            default: return renderLandingPage();
+        }
+    }
+
+    // If logged in, never show the landing page
+    switch (APP.currentTab) {
+        case 'accueil':
+        case 'dashboard':
+            switch (APP.role) {
+                case 'student': return renderStudentDashboard();
+                case 'parent': return renderParentDashboard();
+                case 'teacher': return renderTeacherDashboard();
+                case 'admin': return renderAdminDashboard();
+                default: return renderStudentDashboard();
+            }
+        // Student pages
+        case 'cours': return renderCoursPage();
+        case 'ia-assistant': return renderIAAssistantPage();
+        case 'live': return renderLivePage();
+        case 'communaute': return renderCommunautePage();
+        case 'bienetre': return renderBienEtrePage();
+        case 'whiteboard': return renderWhiteboardPage();
+        // Parent pages
+        case 'suivi': return renderParentSuivi();
+        case 'messages': return renderParentMessages();
+        case 'facturation': return renderParentFacturation();
+        // Teacher pages
+        case 'mes-eleves': return renderTeacherStudents();
+        case 'contenus': return renderTeacherContenus();
+        case 'planning': return renderTeacherPlanning();
+        // Admin pages
+        case 'utilisateurs': return renderAdminUsers();
+        case 'statistiques': return renderAdminStats();
+        case 'configuration': return renderAdminConfig();
         default:
             APP.currentTab = 'dashboard';
             return getPageContent();
