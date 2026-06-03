@@ -394,9 +394,9 @@ function renderLandingPage() {
         <p class="section-subtitle">Des formules adaptées à chaque besoin, sans engagement.</p>
         <div class="pricing-cards-grid" style="margin-bottom:80px">
             ${[
-                { name: 'Essentiel', price: '149', period: '/mois', features: ['Cours en replay illimités', 'Assistant IA 24h/24', 'Exercices interactifs', 'Suivi de progression'], popular: false },
-                { name: 'Accompagné', price: '299', period: '/mois', features: ['Tout Essentiel +', '2h de tutorat/semaine', 'Sessions live illimitées', 'Suivi parental détaillé', 'Psychologue scolaire'], popular: true },
-                { name: 'Sur-mesure', price: '449', period: '/mois', features: ['Tout Accompagné +', '5h de tutorat/semaine', 'Programme personnalisé', 'Coaching orientation', 'Support prioritaire'], popular: false }
+                { name: 'Essentiel', price: '29', period: '/mois', features: ['Cours en replay illimités', 'Assistant IA 24h/24', 'Exercices interactifs', 'Suivi de progression'], popular: false },
+                { name: 'Accompagné', price: '69', period: '/mois', features: ['Tout Essentiel +', '2h de tutorat/semaine', 'Sessions live illimitées', 'Suivi parental détaillé', 'Psychologue scolaire'], popular: true },
+                { name: 'Sur-mesure', price: '99', period: '/mois', features: ['Tout Accompagné +', '5h de tutorat/semaine', 'Programme personnalisé', 'Coaching orientation', 'Support prioritaire'], popular: false }
             ].map(p => `
                 <div class="pricing-card ${p.popular ? 'popular' : ''}">
                     <h3 style="font-size:1.1rem;font-weight:700">${p.name}</h3>
