@@ -8,7 +8,7 @@ const DEFAULT_STATE = {
     role: 'visitor',        // visitor | student | parent | teacher | admin
     username: '',
     currentTab: 'accueil',
-    theme: 'light',
+    theme: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
     fontSize: 'medium',
     dyslexicMode: false,
     mood: null,
@@ -18,7 +18,10 @@ const DEFAULT_STATE = {
 function loadState() {
     try {
         const saved = localStorage.getItem('eduflex_state');
-        return saved ? { ...DEFAULT_STATE, ...JSON.parse(saved) } : { ...DEFAULT_STATE };
+        const state = saved ? { ...DEFAULT_STATE, ...JSON.parse(saved) } : { ...DEFAULT_STATE };
+        document.documentElement.setAttribute('data-theme', state.theme);
+        if (state.dyslexicMode) document.body.classList.add('dyslexic-mode');
+        return state;
     } catch { return { ...DEFAULT_STATE }; }
 }
 
@@ -85,6 +88,7 @@ function setTheme(theme) {
     APP.theme = theme;
     document.documentElement.setAttribute('data-theme', theme);
     saveState();
+    renderApp();
 }
 
 function setFontSize(size) {
@@ -228,13 +232,19 @@ function renderSidebar() {
 // ─── HEADER RENDERING ────────────────────────────────────────────────────────
 function renderHeader() {
     const header = document.getElementById('global-header');
+    const themeIcons = { light: 'sun', dark: 'moon', 'high-contrast': 'eye' };
+    const nextTheme = APP.theme === 'light' ? 'dark' : APP.theme === 'dark' ? 'high-contrast' : 'light';
+
     if (APP.role === 'visitor') {
         header.innerHTML = `
             <div class="sidebar-logo" style="cursor:pointer" onclick="navigateTo('accueil')">
-                <img src="Logo_small.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
+                <img src="Logo.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
                 <span class="logo-text">EduFlex</span>
             </div>
             <div class="header-actions">
+                <button class="icon-btn" onclick="setTheme('${nextTheme}')" title="Thème: ${nextTheme}">
+                    <i data-lucide="${themeIcons[APP.theme]}" style="width:18px;height:18px"></i>
+                </button>
                 <button class="btn btn-secondary btn-sm" onclick="navigateTo('connexion')">
                     <i data-lucide="log-in" style="width:16px;height:16px"></i> Connexion
                 </button>
@@ -245,8 +255,6 @@ function renderHeader() {
         `;
         return;
     }
-    const themeIcons = { light: 'sun', dark: 'moon', 'high-contrast': 'eye' };
-    const nextTheme = APP.theme === 'light' ? 'dark' : APP.theme === 'dark' ? 'high-contrast' : 'light';
     header.innerHTML = `
         <div class="search-bar-container">
             <i data-lucide="search" style="width:18px;height:18px;color:var(--text-muted)"></i>
