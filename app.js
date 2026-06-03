@@ -696,21 +696,18 @@ function renderCoursPage() {
             `).join('')}
         </div>
 
-        <!-- Video Player Demo -->
+        <!-- Video Player - Fonctions affines -->
         <div class="card" style="margin-bottom:32px">
             <div class="card-title"><i data-lucide="play-circle" style="width:20px;height:20px;color:var(--color-primary)"></i> Cours en cours : Fonctions affines</div>
-            <div class="video-player-component">
-                <div class="video-simulation-bg">
-                    <div class="video-play-icon" onclick="showToast('Lecture de la vidéo...', 'primary')">▶</div>
-                    <div class="video-captions-box">Cliquez pour lancer la vidéo du cours</div>
-                </div>
-                <div class="video-controls">
-                    <span style="font-size:0.8rem">00:00 / 45:30</span>
-                    <div style="display:flex;gap:12px;align-items:center">
-                        <button class="icon-btn" style="border-color:rgba(255,255,255,0.3);color:white" onclick="showToast('Sous-titres activés', 'success')"><i data-lucide="subtitles" style="width:16px;height:16px"></i></button>
-                        <button class="icon-btn" style="border-color:rgba(255,255,255,0.3);color:white"><i data-lucide="settings" style="width:16px;height:16px"></i></button>
-                    </div>
-                </div>
+            <div style="position:relative;width:100%;padding-top:56.25%;border-radius:12px;overflow:hidden;background:#000">
+                <iframe
+                    src="https://www.youtube.com/embed/n5_pRx4ozIg?start=7"
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen
+                    title="Cours Fonctions affines"
+                ></iframe>
             </div>
         </div>
 
