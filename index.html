@@ -1,44 +1,77 @@
 <!DOCTYPE html>
 <html lang="fr" data-theme="light" data-font-size="medium">
+
 <head>
+    <script>
+        window.addEventListener('error', function(e) {
+            var div = document.getElementById('debug-log-overlay');
+            if (!div) {
+                div = document.createElement('pre');
+                div.id = 'debug-log-overlay';
+                div.style.position = 'fixed';
+                div.style.bottom = '0';
+                div.style.left = '0';
+                div.style.width = '100%';
+                div.style.background = '#FEE2E2';
+                div.style.color = '#991B1B';
+                div.style.borderTop = '3px solid #EF4444';
+                div.style.zIndex = '9999999';
+                div.style.padding = '16px';
+                div.style.margin = '0';
+                div.style.fontFamily = 'monospace';
+                div.style.fontSize = '14px';
+                div.style.maxHeight = '300px';
+                div.style.overflowY = 'auto';
+                div.style.boxSizing = 'border-box';
+                document.documentElement.appendChild(div);
+            }
+            div.innerText += 'JS ERROR: ' + e.message + '\nat ' + e.filename + ':' + e.lineno + ':' + e.colno + '\n\n';
+        });
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="Logo.png">
-    
+
     <!-- SEO Tags -->
     <title>EduFlex - Plateforme éducative hybride & bienveillante</title>
-    <meta name="description" content="EduFlex réconcilie les élèves de 11 à 25 ans avec l'école grâce à un environnement flexible, un accompagnement humain par des enseignants de l'Éducation Nationale et une IA pédagogique disponible 24h/24.">
-    <meta name="keywords" content="éducation hybride, école à la maison, phobie scolaire, harcèlement, accompagnement scolaire, IA pédagogique, soutien scolaire, enseignant tuteur">
+    <meta name="description"
+        content="EduFlex réconcilie les élèves de 11 à 25 ans avec l'école grâce à un environnement flexible, un accompagnement humain par des enseignants de l'Éducation Nationale et une IA pédagogique disponible 24h/24.">
+    <meta name="keywords"
+        content="éducation hybride, école à la maison, phobie scolaire, harcèlement, accompagnement scolaire, IA pédagogique, soutien scolaire, enseignant tuteur">
     <meta name="author" content="EduFlex SAS">
     <meta name="robots" content="index, follow">
-    
+
     <!-- Open Graph / Social Media -->
     <meta property="og:title" content="EduFlex - L'école réinventée avec bienveillance">
-    <meta property="og:description" content="Une alternative scolaire sécurisante et flexible pour les élèves faisant face à des situations de vie complexes.">
+    <meta property="og:description"
+        content="Une alternative scolaire sécurisante et flexible pour les élèves faisant face à des situations de vie complexes.">
     <meta property="og:type" content="website">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Nunito:wght@300..900&family=Space+Grotesk:wght@300..700&family=Inter:wght@300..900&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Lucide Icons CDN (for gorgeous UI icons) -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <!-- Stylesheet -->
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <!-- App Container -->
     <div id="app" class="app-container">
         <!-- Sidebar Navigation (injected via JS for active states) -->
         <aside id="sidebar-nav" class="sidebar-nav" aria-label="Menu principal"></aside>
-        
+
         <!-- Main Content Area -->
         <div class="main-layout">
             <!-- Global Header -->
             <header id="global-header" class="global-header"></header>
-            
+
             <!-- Page Router Output -->
             <main id="main-content" class="main-content" tabIndex="-1" aria-live="polite">
                 <!-- Views will be injected here -->
@@ -52,7 +85,11 @@
     <!-- Notification system -->
     <div id="toast-container" class="toast-container" aria-live="assertive"></div>
 
+    <!-- Avataaars SVG Avatar Library -->
+    <script src="avataaars.js?v=2"></script>
+
     <!-- Application Script -->
-    <script src="app.js"></script>
+    <script src="app.js?v=2"></script>
 </body>
+
 </html>
