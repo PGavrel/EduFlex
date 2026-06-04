@@ -284,9 +284,12 @@ function renderSidebar() {
                     <span class="user-role">${roleLabels[APP.role] || APP.role}</span>
                 </div>
                 ${APP.role === 'student' ? `
-                    <i data-lucide="palette" style="width:18px;height:18px;margin-left:auto;color:var(--text-muted)" onclick="openAvatarCreator(); event.stopPropagation();"></i>
+                    <div style="display:flex; gap:10px; align-items:center; margin-left:auto;">
+                        <i data-lucide="palette" style="width:18px;height:18px;color:var(--text-muted)" onclick="openAvatarCreator(); event.stopPropagation();" title="Personnaliser"></i>
+                        <i data-lucide="log-out" style="width:18px;height:18px;color:var(--text-muted)" onclick="logout(); event.stopPropagation();" title="Se déconnecter"></i>
+                    </div>
                 ` : `
-                    <i data-lucide="log-out" style="width:18px;height:18px;margin-left:auto;color:var(--text-muted)" onclick="logout(); event.stopPropagation();"></i>
+                    <i data-lucide="log-out" style="width:18px;height:18px;margin-left:auto;color:var(--text-muted)" onclick="logout(); event.stopPropagation();" title="Se déconnecter"></i>
                 `}
             </div>
         </div>
@@ -3859,9 +3862,14 @@ function renderAvatarCreatorContent() {
                     ${tabContent}
                 </div>
                 
-                <div style="display:flex;gap:12px;justify-content:flex-end">
-                    <button class="btn btn-secondary" onclick="closeAvatarCreator()">Annuler</button>
-                    <button class="btn btn-primary" onclick="saveAvatar()">Enregistrer</button>
+                <div style="display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+                    <button class="btn btn-secondary" onclick="logout(); closeAvatarCreator();" style="border-color:var(--color-danger); color:var(--color-danger)">
+                        <i data-lucide="log-out" style="width:16px;height:16px;margin-right:6px"></i>Déconnexion
+                    </button>
+                    <div style="display:flex;gap:12px">
+                        <button class="btn btn-secondary" onclick="closeAvatarCreator()">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveAvatar()">Enregistrer</button>
+                    </div>
                 </div>
             </div>
         </div>
