@@ -254,7 +254,7 @@ function renderHeader() {
     if (APP.role === 'visitor') {
         header.innerHTML = `
             <div class="sidebar-logo" style="cursor:pointer" onclick="navigateTo('accueil')">
-                <img src="Logo.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
+                <img src="Logo_small.png" alt="EduFlex" style="width:36px;height:36px;border-radius:8px;object-fit:contain">
                 <span class="logo-text">EduFlex</span>
             </div>
             <div class="header-actions">
