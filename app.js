@@ -524,9 +524,9 @@ function renderLandingPage() {
         <p class="section-subtitle">Des formules adaptées à chaque besoin, sans engagement.</p>
         <div class="pricing-cards-grid" style="margin-bottom:80px">
             ${[
-            { name: 'Essentiel', price: '29', period: '/mois', features: ['Cours en replay illimités', 'Assistant IA 24h/24', 'Exercices interactifs', 'Suivi de progression'], popular: false },
-            { name: 'Accompagné', price: '67', period: '/mois', features: ['Tout Essentiel +', '2h de tutorat/semaine', 'Sessions live illimitées', 'Suivi parental détaillé', 'Psychologue scolaire'], popular: true },
-            { name: 'Sur-mesure', price: '99', period: '/mois', features: ['Tout Accompagné +', '5h de tutorat/semaine', 'Programme personnalisé', 'Coaching orientation', 'Support prioritaire'], popular: false }
+            { name: 'Essentiel', price: '00', period: '/mois', features: ['Cours en replay illimités', 'Assistant IA 24h/24', 'Exercices interactifs', 'Suivi de progression'], popular: false },
+            { name: 'Accompagné', price: '19', period: '/mois', features: ['Tout Essentiel +', '2h de tutorat/semaine', 'Sessions live illimitées', 'Suivi parental détaillé', 'Psychologue scolaire'], popular: true },
+            { name: 'Sur-mesure', price: '67', period: '/mois', features: ['Tout Accompagné +', '5h de tutorat/semaine', 'Programme personnalisé', 'Coaching orientation', 'Support prioritaire'], popular: false }
         ].map(p => `
                 <div class="pricing-card ${p.popular ? 'popular' : ''}">
                     <h3 style="font-size:1.1rem;font-weight:700">${p.name}</h3>
@@ -3349,7 +3349,7 @@ const DASHBOARD_QUIZ = [
 
 function renderMiniQuizWidget() {
     const qData = DASHBOARD_QUIZ[dashQuizCurrentQuestion];
-    
+
     if (dashQuizState === 'not-started') {
         return `
             <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; height:100%; min-height:180px; gap:12px;">
@@ -3405,28 +3405,28 @@ function renderMiniQuizWidget() {
 
             <div style="display:flex; flex-direction:column; gap:8px;">
                 ${qData.options.map((opt, idx) => {
-                    let className = 'quiz-option-item';
-                    let extraStyle = 'padding: 8px 12px; font-size: 0.8rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s;';
-                    
-                    if (dashQuizState === 'answered') {
-                        if (idx === qData.correct) {
-                            extraStyle += ' background-color: var(--color-success-light); border-color: var(--color-success); color: var(--color-success); font-weight: 700;';
-                        } else if (idx === dashQuizSelectedOption) {
-                            extraStyle += ' background-color: var(--color-danger-light); border-color: var(--color-danger); color: var(--color-danger);';
-                        } else {
-                            extraStyle += ' opacity: 0.6; cursor: not-allowed;';
-                        }
-                    } else {
-                        extraStyle += ' background-color: var(--bg-card);';
-                    }
+        let className = 'quiz-option-item';
+        let extraStyle = 'padding: 8px 12px; font-size: 0.8rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s;';
 
-                    const clickAction = dashQuizState === 'playing' ? `selectDashQuizOption(${idx})` : '';
-                    return `
+        if (dashQuizState === 'answered') {
+            if (idx === qData.correct) {
+                extraStyle += ' background-color: var(--color-success-light); border-color: var(--color-success); color: var(--color-success); font-weight: 700;';
+            } else if (idx === dashQuizSelectedOption) {
+                extraStyle += ' background-color: var(--color-danger-light); border-color: var(--color-danger); color: var(--color-danger);';
+            } else {
+                extraStyle += ' opacity: 0.6; cursor: not-allowed;';
+            }
+        } else {
+            extraStyle += ' background-color: var(--bg-card);';
+        }
+
+        const clickAction = dashQuizState === 'playing' ? `selectDashQuizOption(${idx})` : '';
+        return `
                         <div class="${className}" style="${extraStyle}" onclick="${clickAction}">
                             ${opt}
                         </div>
                     `;
-                }).join('')}
+    }).join('')}
             </div>
 
             ${dashQuizState === 'answered' ? `
@@ -3448,7 +3448,7 @@ function startDashQuiz() {
     dashQuizTimer = 15;
     dashQuizSelectedOption = null;
     playRetroSound('click');
-    
+
     if (dashQuizTimerInterval) clearInterval(dashQuizTimerInterval);
     dashQuizTimerInterval = setInterval(() => {
         if (dashQuizState === 'playing') {
@@ -3475,7 +3475,7 @@ function selectDashQuizOption(optionIdx) {
     if (dashQuizState !== 'playing') return;
     dashQuizState = 'answered';
     dashQuizSelectedOption = optionIdx;
-    
+
     if (dashQuizTimerInterval) {
         clearInterval(dashQuizTimerInterval);
         dashQuizTimerInterval = null;
@@ -3496,7 +3496,7 @@ function selectDashQuizOption(optionIdx) {
     } else {
         playRetroSound('error');
         showToast(optionIdx === -1 ? 'Temps écoulé ! ⏱️' : 'Mauvaise réponse...', 'warning');
-        
+
         const miniQuizBox = document.getElementById('mini-quiz-box');
         if (miniQuizBox) {
             miniQuizBox.classList.add('shake-error');
@@ -3521,7 +3521,7 @@ function nextDashQuizQuestion() {
         dashQuizState = 'playing';
         dashQuizTimer = 15;
         dashQuizSelectedOption = null;
-        
+
         if (dashQuizTimerInterval) clearInterval(dashQuizTimerInterval);
         dashQuizTimerInterval = setInterval(() => {
             if (dashQuizState === 'playing') {
@@ -3534,7 +3534,7 @@ function nextDashQuizQuestion() {
             }
         }, 1000);
     }
-    
+
     renderApp();
 }
 
