@@ -247,7 +247,11 @@ body {
     outline: 3px solid var(--color-primary);
     outline-offset: 2px;
 }
-
+@media (min-width: 768px) {
+    .bottom-navbar {
+        display: none !important;
+    }
+}
 button, input, select, textarea {
     font-size: inherit;
     font-family: inherit;

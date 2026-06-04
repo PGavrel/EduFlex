@@ -683,12 +683,12 @@ function renderStudentDashboard() {
     }
 
     APP.rpgStats = APP.rpgStats || { INT: 50, FOCUS: 45, DEDICATION: 60, CREATIVE: 30 };
-    const statsList = [
+    const statsList = APP.rpgStats ? [
         { key: 'INT', name: 'INT (Cours)', color: '#7C3AED' },
         { key: 'FOCUS', name: 'FOCUS (Quiz)', color: '#3B82F6' },
         { key: 'DEDICATION', name: 'DEDICATION (Série)', color: '#34D399' },
         { key: 'CREATIVE', name: 'CREATIVE (Art)', color: '#F472B6' }
-    ];
+    ] : [];
 
     const quests = [
         { id: 'quest-avatar', title: 'Créer ton avatar personnalisé', xp: 50, coins: 20, isCompleted: true },
