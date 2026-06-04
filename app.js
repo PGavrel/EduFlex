@@ -306,14 +306,18 @@ function renderChatbotWidget() {
         <div class="chatbot-popup-window" id="chatbot-popup">
             <div class="ia-chat-header">
                 <div class="ia-chat-botinfo">
-                    <div class="ia-avatar"><i data-lucide="bot" style="width:22px;height:22px"></i></div>
-                    <div><strong>FlexBot</strong><br><small style="color:var(--text-secondary)">IA pédagogique</small></div>
+                    <div class="ia-avatar" style="width:36px;height:36px;min-width:36px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%;">
+                        <img src="avatar_william.png" alt="Avatar de William" style="width:100%; height:100%; object-fit: cover;">
+                    </div>
+                    <div><strong>William</strong><br><small style="color:var(--text-secondary)">IA pédagogique</small></div>
                 </div>
                 <button class="icon-btn" onclick="toggleChatPopup()"><i data-lucide="x" style="width:16px;height:16px"></i></button>
             </div>
             <div class="ia-messages-container" id="chatbot-messages">
                 <div class="chat-bubble-wrapper ia">
-                    <div class="ia-avatar" style="width:32px;height:32px;min-width:32px"><i data-lucide="bot" style="width:16px;height:16px"></i></div>
+                    <div class="ia-avatar" style="width:36px;height:36px;min-width:36px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%;">
+                        <img src="avatar_william.png" alt="Avatar de William" style="width:100%; height:100%; object-fit: cover;">
+                    </div>
                     <div class="chat-bubble">Salut ${APP.username} ! 👋 Comment puis-je t'aider aujourd'hui ?</div>
                 </div>
             </div>
@@ -1079,21 +1083,25 @@ function renderIAAssistantPage() {
     return `
     <div class="fade-in-up">
         <h1 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">Assistant IA</h1>
-        <p style="color:var(--text-secondary);margin-bottom:24px">FlexBot est là pour t'accompagner dans tes révisions et répondre à tes questions.</p>
+        <p style="color:var(--text-secondary);margin-bottom:24px">William est là pour t'accompagner dans tes révisions et répondre à tes questions.</p>
         <div class="ia-chat-interface">
             <div class="ia-chat-header">
                 <div class="ia-chat-botinfo">
-                    <div class="ia-avatar"><i data-lucide="bot" style="width:24px;height:24px"></i></div>
+                    <div class="ia-avatar" style="width:36px;height:36px;min-width:36px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%;">
+                        <img src="avatar_william.png" alt="Avatar de William" style="width:100%; height:100%; object-fit: cover;">
+                    </div>
                     <div>
-                        <strong style="font-size:1rem">FlexBot</strong>
+                        <strong style="font-size:1rem">William</strong>
                         <div style="font-size:0.8rem;color:var(--text-secondary)"><span class="status-indicator status-active" style="width:8px;height:8px;display:inline-block;margin-right:4px"></span>En ligne – IA pédagogique</div>
                     </div>
                 </div>
             </div>
             <div class="ia-messages-container" id="ia-main-messages">
                 <div class="chat-bubble-wrapper ia">
-                    <div class="ia-avatar" style="width:36px;height:36px;min-width:36px"><i data-lucide="bot" style="width:18px;height:18px"></i></div>
-                    <div class="chat-bubble">Salut ${APP.username} ! 👋 Je suis FlexBot, ton assistant pédagogique. Je peux t'aider à comprendre tes cours, résoudre des exercices, ou simplement discuter. Que veux-tu faire aujourd'hui ?</div>
+                    <div class="ia-avatar" style="width:36px;height:36px;min-width:36px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%;">
+                        <img src="avatar_william.png" alt="Avatar de William" style="width:100%; height:100%; object-fit: cover;">
+                    </div>
+                    <div class="chat-bubble">Salut ${APP.username} ! 👋 Je suis William, ton assistant pédagogique. Je peux t'aider à comprendre tes cours, résoudre des exercices, ou simplement discuter. Que veux-tu faire aujourd'hui ?</div>
                 </div>
             </div>
             <div class="chat-quick-prompts">
@@ -1130,7 +1138,9 @@ function sendIAMainMessage() {
     setTimeout(() => {
         container.innerHTML += `
             <div class="chat-bubble-wrapper ia">
-                <div class="ia-avatar" style="width:36px;height:36px;min-width:36px"><i data-lucide="bot" style="width:18px;height:18px"></i></div>
+                <div class="ia-avatar" style="width:36px;height:36px;min-width:36px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%;">
+                    <img src="avatar_william.png" alt="Avatar de William" style="width:100%; height:100%; object-fit: cover;">
+                </div>
                 <div class="chat-bubble">${responses[Math.floor(Math.random() * responses.length)]}</div>
             </div>
         `;
@@ -2013,7 +2023,7 @@ function renderAdminStats() {
                 <div style="display:flex; flex-direction:column; gap:12px;">
                     ${[
             { label: 'Connexions d\'élèves uniques', val: '645', pct: 92 },
-            { label: 'Utilisation de l\'IA FlexBot', val: '2 840 requêtes', pct: 85 },
+            { label: 'Utilisation de l\'IA William', val: '2 840 requêtes', pct: 85 },
             { label: 'Heures cumulées en live', val: '124 heures', pct: 78 }
         ].map(s => `
                         <div>
@@ -2169,8 +2179,8 @@ function renderMessageriePage() {
                 </div>
                 <div class="contacts-list">
                     ${MESSAGES_CONTACTS.map(c => {
-                        const isActive = c.id === activeContact.id;
-                        return `
+        const isActive = c.id === activeContact.id;
+        return `
                         <div class="contact-item ${isActive ? 'active' : ''}" onclick="selectChatContact('${c.id}')">
                             <div class="contact-avatar">
                                 ${c.initiales}
@@ -2185,7 +2195,7 @@ function renderMessageriePage() {
                             </div>
                         </div>
                         `;
-                    }).join('')}
+    }).join('')}
                 </div>
             </div>
 
@@ -2237,7 +2247,7 @@ function sendUserChatMessage() {
 
     const contactId = APP.activeChatContact || MESSAGES_CONTACTS[0].id;
     MESSAGES_HISTORY[contactId].push({ sender: 'me', text: text, time: 'À l\'instant' });
-    
+
     // Update sidebar last message
     const contact = MESSAGES_CONTACTS.find(c => c.id === contactId);
     if (contact) {
@@ -2300,11 +2310,11 @@ function renderCalendrierPage() {
             <div class="calendar-grid-body">
                 <!-- Empty cells for start of June 2026 (starts on a Monday) -->
                 ${Array.from({ length: 30 }).map((_, i) => {
-                    const dayNum = i + 1;
-                    const isToday = dayNum === 3; // Let's assume today is June 3rd, 2026
-                    const dayEvents = CALENDAR_EVENTS.filter(e => e.day === dayNum);
-                    
-                    return `
+        const dayNum = i + 1;
+        const isToday = dayNum === 3; // Let's assume today is June 3rd, 2026
+        const dayEvents = CALENDAR_EVENTS.filter(e => e.day === dayNum);
+
+        return `
                     <div class="calendar-day-cell ${isToday ? 'today' : ''}">
                         <span class="calendar-day-num">${dayNum}</span>
                         ${dayEvents.map(e => `
@@ -2314,7 +2324,7 @@ function renderCalendrierPage() {
                         `).join('')}
                     </div>
                     `;
-                }).join('')}
+    }).join('')}
             </div>
         </div>
     </div>
@@ -2361,11 +2371,11 @@ function renderExamensPage() {
                 </div>
                 <div style="display:flex; flex-direction:column; gap:12px">
                     ${[
-                        { subject: 'Mathématiques', val: 82, color: 'blue' },
-                        { subject: 'Français', val: 75, color: 'green' },
-                        { subject: 'Histoire-Géo', val: 90, color: 'orange' },
-                        { subject: 'SVT / Sciences', val: 65, color: 'purple' }
-                    ].map(s => `
+            { subject: 'Mathématiques', val: 82, color: 'blue' },
+            { subject: 'Français', val: 75, color: 'green' },
+            { subject: 'Histoire-Géo', val: 90, color: 'orange' },
+            { subject: 'SVT / Sciences', val: 65, color: 'purple' }
+        ].map(s => `
                         <div>
                             <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:600;margin-bottom:4px">
                                 <span>${s.subject}</span><span>${s.val}%</span>
@@ -2526,7 +2536,7 @@ function renderExamensBlancsPage() {
                     <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.6">
                         - Ne rafraîchissez pas la page sous peine de perdre votre avancement.<br>
                         - Vous pouvez soumettre à tout moment dès que vous avez terminé.<br>
-                        - À l'issue du temps, votre copie est envoyée pour correction automatique par l'IA FlexBot.
+                        - À l'issue du temps, votre copie est envoyée pour correction automatique par l'IA William.
                     </p>
                 </div>
                 <div style="display:flex;gap:12px;margin-top:20px">
@@ -2541,11 +2551,11 @@ function renderExamensBlancsPage() {
 
 // Overwrite the routing switcher to output the simulator if active
 const originalGetPageContent = getPageContent;
-getPageContent = function() {
+getPageContent = function () {
     if (APP.examSimulating) {
         return renderExamensBlancsPage();
     }
-    
+
     // Result of simulation
     if (APP.currentTab === 'examens' && APP.examScore !== null) {
         const score = APP.examScore;
@@ -2556,9 +2566,9 @@ getPageContent = function() {
             <div style="font-size:4rem;margin-bottom:20px">🏆</div>
             <h1 style="font-size:2rem;font-weight:800;margin-bottom:12px">Résultat de l'examen blanc</h1>
             <div style="font-size:3rem;font-weight:800;color:var(--color-success);margin-bottom:16px">${score}/20</div>
-            <p style="color:var(--text-secondary);max-width:500px;margin:0 auto 32px">Félicitations ! L'IA FlexBot a analysé ta copie et ton score montre une excellente maîtrise des fondamentaux.</p>
+            <p style="color:var(--text-secondary);max-width:500px;margin:0 auto 32px">Félicitations ! L'IA William a analysé ta copie et ton score montre une excellente maîtrise des fondamentaux.</p>
             <div class="card" style="max-width:600px;margin:0 auto 32px;text-align:left;padding:24px">
-                <h4 style="font-weight:700;margin-bottom:8px">Analyse détaillée de FlexBot</h4>
+                <h4 style="font-weight:700;margin-bottom:8px">Analyse détaillée de William</h4>
                 <p style="font-size:0.95rem;line-height:1.6;color:var(--text-primary)">
                     - <strong>Points forts :</strong> L'application de l'algorithme est parfaitement maîtrisée (Exercice 1).<br>
                     - <strong>Axe de révision :</strong> Soigne la rédaction du calcul littéraire pour le calcul d'images (Exercice 2). Review la fiche "Les fonctions affines".
@@ -2580,7 +2590,7 @@ const BUDDIES_DATA = [
 ];
 
 const originalRenderCommunautePage = renderCommunautePage;
-renderCommunautePage = function() {
+renderCommunautePage = function () {
     const parentHtml = originalRenderCommunautePage();
     return `
     ${parentHtml}
@@ -2621,7 +2631,7 @@ function startBuddyDiscussion(buddyName) {
 
 // ─── PARENT DASHBOARD ET BILANS HEBDOMADAIRES ENRICHIS ─────────────────────────
 const originalRenderParentDashboard = renderParentDashboard;
-renderParentDashboard = function() {
+renderParentDashboard = function () {
     return `
     <div class="fade-in-up">
         <div class="student-welcome-banner">
@@ -2663,11 +2673,11 @@ renderParentDashboard = function() {
             <div class="card">
                 <div class="card-title"><i data-lucide="line-chart" style="width:20px;height:20px;color:var(--color-success)"></i> Détail par compétences</div>
                 ${[
-                    { name: 'Compréhension de notions', val: 90 },
-                    { name: 'Autonomie de travail', val: 80 },
-                    { name: 'Participation aux lives', val: 100 },
-                    { name: 'Gestion des émotions', val: 75 }
-                ].map(c => `
+            { name: 'Compréhension de notions', val: 90 },
+            { name: 'Autonomie de travail', val: 80 },
+            { name: 'Participation aux lives', val: 100 },
+            { name: 'Gestion des émotions', val: 75 }
+        ].map(c => `
                     <div style="margin-bottom:12px">
                         <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:600;margin-bottom:4px">
                             <span>${c.name}</span><span>${c.val}%</span>
@@ -2691,7 +2701,7 @@ renderParentDashboard = function() {
 
 // ─── AMÉLIORATION DU DASHBOARD ENSEIGNANT ───────────────────────────────────────
 const originalRenderTeacherDashboard = renderTeacherDashboard;
-renderTeacherDashboard = function() {
+renderTeacherDashboard = function () {
     return `
     <div class="fade-in-up">
         <div class="student-welcome-banner">
@@ -2703,10 +2713,10 @@ renderTeacherDashboard = function() {
 
         <div class="dashboard-quick-stats">
             ${[
-                { icon: 'users', value: '18', label: 'Élèves assignés', color: 'blue' },
-                { icon: 'file-text', value: '4', label: 'Devoirs en attente', color: 'orange' },
-                { icon: 'trending-up', value: '92%', label: 'Taux de participation', color: 'green' }
-            ].map(s => `
+            { icon: 'users', value: '18', label: 'Élèves assignés', color: 'blue' },
+            { icon: 'file-text', value: '4', label: 'Devoirs en attente', color: 'orange' },
+            { icon: 'trending-up', value: '92%', label: 'Taux de participation', color: 'green' }
+        ].map(s => `
                 <div class="quick-stat-card">
                     <div class="stat-icon-wrapper ${s.color}"><i data-lucide="${s.icon}" style="width:24px;height:24px"></i></div>
                     <div><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>
@@ -2749,7 +2759,7 @@ renderTeacherDashboard = function() {
 
 // ─── ESPACE ADMINISTRATEUR ───────────────────────────────────────────────────
 const originalRenderAdminDashboard = renderAdminDashboard;
-renderAdminDashboard = function() {
+renderAdminDashboard = function () {
     return `
     <div class="fade-in-up">
         <div class="student-welcome-banner">
@@ -2761,10 +2771,10 @@ renderAdminDashboard = function() {
 
         <div class="dashboard-quick-stats" style="margin-top:24px">
             ${[
-                { icon: 'activity', value: '12 840', label: 'Requêtes FlexBot', color: 'blue' },
-                { icon: 'shield', value: '0', label: 'Signalement en attente', color: 'green' },
-                { icon: 'credit-card', value: '97 800 €', label: 'Chiffre d\'affaires', color: 'orange' }
-            ].map(s => `
+            { icon: 'activity', value: '12 840', label: 'Requêtes William', color: 'blue' },
+            { icon: 'shield', value: '0', label: 'Signalement en attente', color: 'green' },
+            { icon: 'credit-card', value: '97 800 €', label: 'Chiffre d\'affaires', color: 'orange' }
+        ].map(s => `
                 <div class="quick-stat-card">
                     <div class="stat-icon-wrapper ${s.color}"><i data-lucide="${s.icon}" style="width:24px;height:24px"></i></div>
                     <div><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>
@@ -2781,7 +2791,7 @@ renderAdminDashboard = function() {
                         <span style="color:var(--color-success);font-weight:700">🟢 Opérationnel</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;font-size:0.9rem">
-                        <span>API FlexBot (IA Pédagogique)</span>
+                        <span>API William (IA Pédagogique)</span>
                         <span style="color:var(--color-success);font-weight:700">🟢 Opérationnel</span>
                     </div>
                     <div style="display:flex;justify-content:space-between;font-size:0.9rem">
@@ -2805,7 +2815,7 @@ renderAdminDashboard = function() {
 
 // ─── AMÉLIORATION DU PIED DE PAGE LANDING PAGE & GLOBAL ───────────────────────
 const originalRenderLandingPage = renderLandingPage;
-renderRenderLandingPage = function() {
+renderRenderLandingPage = function () {
     const parentHtml = originalRenderLandingPage();
     return `
     ${parentHtml}
@@ -2867,7 +2877,7 @@ renderRenderLandingPage = function() {
 
 // Override public route selector for rendering public landing footer
 const originalGetPageContentPublic = getPageContent;
-getPageContent = function() {
+getPageContent = function () {
     const parentVal = originalGetPageContent();
     if (APP.role === 'visitor' && APP.currentTab === 'accueil') {
         return renderRenderLandingPage();
