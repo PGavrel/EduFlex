@@ -3341,6 +3341,9 @@ let tempAvatar = null;
 let dashQuizCurrentQuestion = 0;
 let dashQuizScore = 0;
 let dashQuizState = 'not-started'; // 'not-started' | 'playing' | 'answered' | 'finished'
+let dashQuizTimerInterval = null;
+let dashQuizTimer = 15;
+let dashQuizSelectedOption = null;
 const DASHBOARD_QUIZ = [
     { q: "Quel est l'organe principal de la photosynthèse ?", options: ["La racine", "La feuille", "La fleur", "La tige"], correct: 1, explanation: "Les feuilles contiennent la chlorophylle qui capte la lumière." },
     { q: "Qui a écrit 'Les Misérables' ?", options: ["Émile Zola", "Gustave Flaubert", "Victor Hugo", "Albert Camus"], correct: 2, explanation: "Victor Hugo a publié ce chef-d'œuvre littéraire en 1862." },
