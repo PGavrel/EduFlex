@@ -25,7 +25,22 @@ const DEFAULT_STATE = {
     examSimulating: false,
     examTimeRemaining: 0,
     examSubject: 'Mathématiques',
-    examScore: null
+    examScore: null,
+
+    // Gamification & Avatar variables
+    studentTheme: 'college', // college | lycee
+    avatar: null, // format: { top, hairColor, skin, clothing, clothingColor, accessories, eyes, eyebrows, mouth }
+    coins: 100,
+    xp: 0,
+    level: 1,
+    unlockedAccessories: ['none', 'prescription01'], // AvataaarsJs accessory IDs unlocked by default
+    shopBoughtAccessories: [],
+    streak: 3,
+    completedQuests: [],
+    claimedQuests: [],
+    exploredSubjects: [],
+    unlockedBadges: [],
+    soundMuted: false
 };
 
 function loadState() {
@@ -33,6 +48,19 @@ function loadState() {
         const saved = localStorage.getItem('eduflex_state');
         const state = saved ? { ...DEFAULT_STATE, ...JSON.parse(saved) } : { ...DEFAULT_STATE };
         document.documentElement.setAttribute('data-theme', state.theme);
+
+        // Migrate old avatar format (skinColor/hairStyle) to new AvataaarsJs format
+        if (state.avatar && state.avatar.skinColor && !state.avatar.skin) {
+            state.avatar = null; // Reset old format, user will re-create
+        }
+
+        // Apply student theme if role is student
+        if (state.role === 'student') {
+            document.documentElement.setAttribute('data-student-theme', state.studentTheme || 'college');
+        } else {
+            document.documentElement.removeAttribute('data-student-theme');
+        }
+
         if (state.dyslexicMode) document.body.classList.add('dyslexic-mode');
         return state;
     } catch { return { ...DEFAULT_STATE }; }
@@ -215,6 +243,24 @@ function renderSidebar() {
     const navItems = getNavItems();
     const roleLabels = { student: 'Élève', parent: 'Parent', teacher: 'Enseignant', admin: 'Administrateur' };
 
+    let avatarHtml = `
+        <div class="user-avatar" style="background:linear-gradient(135deg,var(--color-primary),var(--color-success));display:flex;align-items:center;justify-content:center;color:var(--text-on-primary,white);font-weight:700;font-size:1rem;border:none;">
+            ${APP.username.charAt(0).toUpperCase()}
+        </div>
+    `;
+    let userSummaryClickAction = `logout()`;
+    let userSummaryTitle = `Déconnexion`;
+
+    if (APP.role === 'student') {
+        avatarHtml = `
+            <div class="avatar-sidebar-container" onclick="openAvatarCreator(); event.stopPropagation();" style="width:42px; height:42px; cursor:pointer;" title="Personnaliser mon avatar et le thème">
+                ${renderAvatarSVG(APP.avatar, APP.mood, 42)}
+            </div>
+        `;
+        userSummaryClickAction = `openAvatarCreator()`;
+        userSummaryTitle = `Personnaliser mon profil`;
+    }
+
     sidebar.innerHTML = `
         <div class="sidebar-logo">
             <img src="Logo_small.png" alt="EduFlex" style="width:60px;height:60px;border-radius:8px;object-fit:contain">
@@ -223,7 +269,7 @@ function renderSidebar() {
         <ul class="nav-links">
             ${navItems.map(item => `
                 <li class="nav-item ${APP.currentTab === item.id ? 'active' : ''}">
-                    <a href="#" onclick="navigateTo('${item.id}'); return false;" id="nav-${item.id}">
+                    <a href="#" onclick="playRetroSound('click'); navigateTo('${item.id}'); return false;" id="nav-${item.id}">
                         <i data-lucide="${item.icon}" style="width:20px;height:20px"></i>
                         <span>${item.label}</span>
                     </a>
@@ -231,15 +277,17 @@ function renderSidebar() {
             `).join('')}
         </ul>
         <div class="sidebar-footer">
-            <div class="user-profile-summary" onclick="logout()">
-                <div class="user-avatar" style="background:linear-gradient(135deg,var(--color-primary),var(--color-success));display:flex;align-items:center;justify-content:center;color:var(--text-on-primary,white);font-weight:700;font-size:1rem;border:none;">
-                    ${APP.username.charAt(0).toUpperCase()}
-                </div>
-                <div class="user-info-text">
+            <div class="user-profile-summary" onclick="${userSummaryClickAction}" title="${userSummaryTitle}">
+                ${avatarHtml}
+                <div class="user-info-text" style="flex-grow:1; margin-left: 8px;">
                     <span class="user-name">${APP.username}</span>
                     <span class="user-role">${roleLabels[APP.role] || APP.role}</span>
                 </div>
-                <i data-lucide="log-out" style="width:18px;height:18px;margin-left:auto;color:var(--text-muted)"></i>
+                ${APP.role === 'student' ? `
+                    <i data-lucide="palette" style="width:18px;height:18px;margin-left:auto;color:var(--text-muted)" onclick="openAvatarCreator(); event.stopPropagation();"></i>
+                ` : `
+                    <i data-lucide="log-out" style="width:18px;height:18px;margin-left:auto;color:var(--text-muted)" onclick="logout(); event.stopPropagation();"></i>
+                `}
             </div>
         </div>
     `;
@@ -271,6 +319,58 @@ function renderHeader() {
         `;
         return;
     }
+
+    if (APP.role === 'student') {
+        const xpProgress = APP.xp || 0;
+        const level = APP.level || 1;
+        const coins = APP.coins || 0;
+        const streak = APP.streak || 0;
+        const soundIcon = APP.soundMuted ? 'volume-x' : 'volume-2';
+
+        header.innerHTML = `
+            <div style="display:flex; align-items:center; gap:20px; flex-grow:1; max-width:600px; min-width: 250px;">
+                <div class="xp-level-badge" onclick="openAvatarCreator()" style="cursor:pointer; width:48px; height:48px; min-width:48px;" title="Clique pour modifier ton avatar et ton thème !">
+                    ${level}
+                </div>
+                <div style="display:flex; flex-direction:column; flex-grow:1; gap:4px">
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:800;">
+                        <span>Niveau ${level}</span>
+                        <span>${xpProgress} / 100 XP</span>
+                    </div>
+                    <div class="xp-progress-bar-container">
+                        <div class="xp-progress-fill" style="width: ${xpProgress}%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="streak-container" title="Série de jours consécutifs !">
+                    <span class="streak-flame">🔥</span>
+                    <span>${streak}</span>
+                </div>
+                
+                <div style="display:inline-flex; align-items:center; gap:6px; font-weight:800; color:#F59E0B; background:rgba(245, 158, 11, 0.1); border:1px solid rgba(245, 158, 11, 0.2); padding:6px 12px; border-radius:12px;" title="Tes pièces d'or !">
+                    <span>🪙</span>
+                    <span>${coins}</span>
+                </div>
+                
+                <button class="icon-btn ${APP.soundMuted ? '' : 'active'}" onclick="toggleMuteSound()" title="${APP.soundMuted ? 'Activer le son' : 'Couper le son'}">
+                    <i data-lucide="${soundIcon}" style="width:18px;height:18px"></i>
+                </button>
+                
+                <div class="quick-accessibility-menu">
+                    <button class="icon-btn ${APP.ttsActive ? 'active' : ''}" onclick="toggleTTS()" title="Lecture vocale">
+                        <i data-lucide="${APP.ttsActive ? 'volume-x' : 'volume-2'}" style="width:18px;height:18px"></i>
+                    </button>
+                    <button class="icon-btn ${APP.dyslexicMode ? 'active' : ''}" onclick="toggleDyslexicMode()" title="Mode dyslexie">
+                        <i data-lucide="type" style="width:18px;height:18px"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
     header.innerHTML = `
         <div class="search-bar-container">
             <i data-lucide="search" style="width:18px;height:18px;color:var(--text-muted)"></i>
@@ -377,7 +477,7 @@ function renderLandingPage() {
             <div class="hero-content">
                 <div class="hero-tagline"><i data-lucide="sparkles" style="width:16px;height:16px"></i> L'école réinventée</div>
                 <h1 class="hero-title">Apprendre autrement,<br><span>à son rythme</span></h1>
-                <p class="hero-desc">EduFlex réconcilie les élèves de 11 à 25 ans avec l'école grâce à un environnement flexible, un accompagnement humain et une IA pédagogique disponible 24h/24.</p>
+                <p class="hero-desc">EduFlex réconcilie les élèves de 11 à 20 ans avec l'école grâce à un environnement flexible, un accompagnement humain et une IA pédagogique disponible 24h/24.</p>
                 <div class="hero-actions">
                     <button class="btn btn-primary" onclick="navigateTo('inscription')"><i data-lucide="rocket" style="width:18px;height:18px"></i> Commencer gratuitement</button>
                     <button class="btn btn-secondary" onclick="navigateTo('connexion')"><i data-lucide="play-circle" style="width:18px;height:18px"></i> Découvrir la plateforme</button>
@@ -565,120 +665,302 @@ function handleRegister(e) {
 function renderStudentDashboard() {
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir';
+
+    if (!APP.avatar) {
+        setTimeout(openAvatarCreator, 500);
+        return `
+            <div class="fade-in-up" style="text-align:center; padding:80px 20px;">
+                <div style="font-size:4rem; margin-bottom:24px;">🎒</div>
+                <h1 style="font-size:2rem; font-weight:800; margin-bottom:12px;">Bienvenue sur EduFlex !</h1>
+                <p style="color:var(--text-secondary); max-width:500px; margin:0 auto 32px; font-size:1.1rem;">
+                    Prêt à commencer ton aventure d'apprentissage ? Crée ton avatar et choisis ton style (Collège Aventurier ou Lycée Pro Gamer) pour personnaliser ta plateforme !
+                </p>
+                <button class="btn btn-primary" onclick="openAvatarCreator()" style="padding:16px 32px; font-size:1.1rem;">
+                    🚀 Créer mon avatar personnalisé
+                </button>
+            </div>
+        `;
+    }
+
+    APP.rpgStats = APP.rpgStats || { INT: 50, FOCUS: 45, DEDICATION: 60, CREATIVE: 30 };
+    const statsList = [
+        { key: 'INT', name: 'INT (Cours)', color: '#7C3AED' },
+        { key: 'FOCUS', name: 'FOCUS (Quiz)', color: '#3B82F6' },
+        { key: 'DEDICATION', name: 'DEDICATION (Série)', color: '#34D399' },
+        { key: 'CREATIVE', name: 'CREATIVE (Art)', color: '#F472B6' }
+    ];
+
+    const quests = [
+        { id: 'quest-avatar', title: 'Créer ton avatar personnalisé', xp: 50, coins: 20, isCompleted: true },
+        { id: 'quest-math', title: 'Terminer le quiz de Mathématiques', xp: 40, coins: 15, isCompleted: APP.completedQuests?.includes('quest-math') || false },
+        { id: 'quest-zen', title: 'Faire une séance de respiration de 10s', xp: 30, coins: 10, isCompleted: APP.completedQuests?.includes('quest-zen') || false },
+        { id: 'quest-whiteboard', title: 'Dessiner et sauvegarder sur le Tableau Blanc', xp: 30, coins: 10, isCompleted: APP.completedQuests?.includes('quest-whiteboard') || false }
+    ];
+
+    const flashcardsData = {
+        'Mathématiques': { front: "Quelle est la forme d'une fonction affine ?", back: "f(x) = ax + b, où a est le coefficient directeur et b l'ordonnée à l'origine." },
+        'Français': { front: "Qu'est-ce qu'un oxymore ?", back: "L'alliance de deux mots de sens opposés (ex: Une obscure clarté)." },
+        'SVT': { front: "Qu'est-ce que la mitose cellulaire ?", back: "Une division cellulaire permettant la multiplication des cellules à l'identique." },
+        'Anglais': { front: "Traduction de : 'I look forward to hearing from you'", back: "Dans l'attente de vos nouvelles (formule de politesse)." }
+    };
+    const activeFlashcard = flashcardsData[APP.activeSubject || 'Mathématiques'] || flashcardsData['Mathématiques'];
+
+    const leaderboard = getLeaderboardData();
+
+    const achievements = [
+        { id: 'first-avatar', title: 'Pionnier', desc: 'Avatar personnalisé créé', icon: 'user-check', unlocked: true },
+        { id: 'math-quiz-master', title: 'As des Maths', desc: 'Score parfait au quiz', icon: 'award', unlocked: APP.unlockedBadges?.includes('math-quiz-master') },
+        { id: 'zen-master', title: 'Zen Master', desc: 'Respiration complétée', icon: 'wind', unlocked: APP.unlockedBadges?.includes('zen-master') },
+        { id: 'whiteboard-artist', title: 'Artiste', desc: 'Dessin sauvegardé', icon: 'palette', unlocked: APP.unlockedBadges?.includes('whiteboard-artist') },
+        { id: 'streak-3', title: 'Super Streak', desc: 'Série de 3 jours et plus', icon: 'flame', unlocked: APP.streak >= 3 }
+    ];
+
+    const shopItems = [
+        { id: 'sunglasses', name: '🕶️ Lunettes de Soleil', price: 50 },
+        { id: 'wayfarers', name: '😎 Wayfarers', price: 60 },
+        { id: 'round', name: '🤓 Lunettes Rondes', price: 40 },
+        { id: 'prescription02', name: '👓 Lunettes Pro', price: 45 },
+        { id: 'kurt', name: '🤪 Kurt Cobain', price: 80 },
+        { id: 'winterHat01', name: '🧢 Bonnet d\'Hiver', price: 70 },
+        { id: 'turban', name: '🧣 Turban', price: 90 },
+        { id: 'hat', name: '🎩 Chapeau', price: 100 },
+        { id: 'eyepatch', name: '🏴‍☠️ Cache-œil Pirate', price: 120 }
+    ];
+
     return `
     <div class="fade-in-up">
-        <!-- Welcome Banner -->
-        <div class="student-welcome-banner">
-            <div class="student-welcome-text">
-                <h2>${greeting}, ${APP.username} ! 👋</h2>
-                <p>Tu as 3 cours prévus aujourd'hui. Continue comme ça, tu es sur la bonne voie !</p>
-            </div>
-            <button class="btn btn-primary" onclick="navigateTo('cours')"><i data-lucide="book-open" style="width:18px;height:18px"></i> Reprendre mon cours</button>
-        </div>
+        <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:24px;" class="dashboard-layout-grid">
+            
+            <div style="display:flex; flex-direction:column; gap:24px;">
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i data-lucide="compass" style="width:22px;height:22px;color:var(--color-primary);"></i>
+                        <span>Quêtes du Jour</span>
+                    </div>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
+                        Complète ces missions quotidiennes pour gagner de l'XP et des pièces d'or !
+                    </p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        ${quests.map(q => {
+        const isClaimed = APP.claimedQuests?.includes(q.id);
+        let actionButton = '';
 
-        <!-- Mood Tracker -->
-        <div class="card" style="margin-bottom:24px;padding:20px">
-            <div class="card-title"><i data-lucide="smile" style="width:20px;height:20px;color:var(--color-warning)"></i> Comment te sens-tu aujourd'hui ?</div>
-            <div class="mood-selector-container">
-                ${['😢', '😟', '😐', '🙂', '😄'].map((emoji, i) => `
-                    <button class="mood-btn ${APP.mood === i ? 'active' : ''}" onclick="setMood(${i})">${emoji}</button>
-                `).join('')}
-            </div>
-            ${APP.mood !== null ? `<p style="margin-top:12px;color:var(--text-secondary);font-size:0.85rem">Merci ! Ton humeur a été enregistrée. ${APP.mood >= 3 ? '🎉 Super !' : APP.mood <= 1 ? '💙 N\'hésite pas à consulter l\'espace bien-être.' : ''}</p>` : ''}
-        </div>
+        if (isClaimed) {
+            actionButton = `<span class="badge badge-success">Récupérée 🎁</span>`;
+        } else if (q.isCompleted) {
+            actionButton = `
+                                    <button class="btn btn-success btn-sm" onclick="claimQuestReward('${q.id}', ${q.xp}, ${q.coins})">
+                                        Récupérer (+${q.xp}XP)
+                                    </button>
+                                `;
+        } else {
+            let clickAction = '';
+            if (q.id === 'quest-math') clickAction = `selectSubject('Mathématiques'); navigateTo('cours');`;
+            else if (q.id === 'quest-zen') clickAction = `navigateTo('bienetre');`;
+            else if (q.id === 'quest-whiteboard') clickAction = `navigateTo('whiteboard');`;
 
-        <!-- Quick Stats -->
-        <div class="dashboard-quick-stats">
-            ${[
-            { icon: 'book-open', value: '12', label: 'Cours complétés', color: 'blue' },
-            { icon: 'trophy', value: '8', label: 'Badges obtenus', color: 'orange' },
-            { icon: 'clock', value: '24h', label: 'Temps d\'étude', color: 'green' },
-            { icon: 'trending-up', value: '85%', label: 'Moyenne générale', color: 'blue' }
-        ].map(s => `
-                <div class="quick-stat-card">
-                    <div class="stat-icon-wrapper ${s.color}"><i data-lucide="${s.icon}" style="width:24px;height:24px"></i></div>
-                    <div><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>
-                </div>
-            `).join('')}
-        </div>
+            actionButton = `
+                                    <button class="btn btn-secondary btn-sm" onclick="${clickAction}">
+                                        Lancer ⚔️
+                                    </button>
+                                `;
+        }
 
-        <!-- Main Grid -->
-        <div class="dashboard-layout-grid">
-            <div>
-                <!-- Schedule -->
-                <div class="card weekly-schedule-card">
-                    <div class="card-title"><i data-lucide="calendar" style="width:20px;height:20px;color:var(--color-primary)"></i> Emploi du temps du jour</div>
-                    <div class="schedule-timeline">
-                        ${[
-            { time: '09:00', title: 'Mathématiques', desc: 'Chapitre 5 : Fonctions affines', type: 'course' },
-            { time: '10:30', title: 'Français – Session Live', desc: 'Analyse de texte avec Mme Dubois', type: 'live' },
-            { time: '14:00', title: 'Histoire-Géo', desc: 'Devoir à rendre : La Révolution industrielle', type: 'homework' },
-            { time: '16:00', title: 'SVT', desc: 'Cours en replay : La cellule animale', type: 'course' }
-        ].map(item => `
-                            <div class="schedule-item ${item.type}">
-                                <span class="schedule-time">${item.time}</span>
-                                <div class="schedule-dot"></div>
-                                <div class="schedule-info">
-                                    <div class="schedule-title">${item.title}</div>
-                                    <div class="schedule-desc">${item.desc}</div>
+        return `
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--border-color); border-radius:var(--border-radius-md); background:rgba(0,0,0,0.01);">
+                                    <div style="display:flex; align-items:center; gap:12px;">
+                                        <i data-lucide="${q.isCompleted ? 'check-circle' : 'circle'}" style="color:${q.isCompleted ? 'var(--color-success)' : 'var(--text-muted)'}; width:20px; height:20px;"></i>
+                                        <div>
+                                            <span style="font-weight:700; font-size:0.9rem; text-decoration:${q.isCompleted ? 'line-through' : 'none'}; opacity:${q.isCompleted ? 0.6 : 1};">${q.title}</span>
+                                            <div style="font-size:0.75rem; color:#F59E0B; font-weight:700;">💎 +${q.xp} XP · 🪙 +${q.coins} Pièces</div>
+                                        </div>
+                                    </div>
+                                    <div>${actionButton}</div>
                                 </div>
-                                ${item.type === 'live' ? '<span class="badge badge-danger" style="animation:pulseBorder 2s infinite">● EN DIRECT</span>' : ''}
-                            </div>
-                        `).join('')}
+                            `;
+    }).join('')}
                     </div>
                 </div>
 
-                <!-- Course Progress -->
                 <div class="card">
-                    <div class="card-title"><i data-lucide="trending-up" style="width:20px;height:20px;color:var(--color-success)"></i> Progression des cours</div>
-                    ${[
-            { name: 'Mathématiques', progress: 72, color: '#3b82f6' },
-            { name: 'Français', progress: 58, color: '#10b981' },
-            { name: 'Histoire-Géo', progress: 85, color: '#f59e0b' },
-            { name: 'SVT', progress: 40, color: '#8b5cf6' }
-        ].map(c => `
-                        <div style="margin-bottom:16px">
-                            <div style="display:flex;justify-content:space-between;font-size:0.9rem;font-weight:600;margin-bottom:4px">
-                                <span>${c.name}</span><span>${c.progress}%</span>
+                    <div class="card-title">
+                        <i data-lucide="gamepad-2" style="width:22px;height:22px;color:var(--color-success);"></i>
+                        <span>Mini-jeux de révision</span>
+                    </div>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
+                        Entraîne-toi en t'amusant avec nos outils interactifs.
+                    </p>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:16px;">
+                        <div class="flashcards-hub" style="background:rgba(0,0,0,0.01); border:1px solid var(--border-color); border-radius:var(--border-radius-md); padding:16px;">
+                            <strong style="font-size:0.85rem; margin-bottom:12px; text-transform:uppercase; color:var(--text-secondary); text-align:center;">Flashcard (${APP.activeSubject})</strong>
+                            <div class="flashcard-wrapper" onclick="flipFlashcard(this)">
+                                <div class="flashcard" id="dash-flashcard">
+                                    <div class="flashcard-face flashcard-front">
+                                        <div style="font-weight:700; font-size:0.85rem;">${activeFlashcard.front}</div>
+                                        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:16px;">(Clique pour retourner)</div>
+                                    </div>
+                                    <div class="flashcard-face flashcard-back">
+                                        <div style="font-size:0.8rem; font-weight:600; line-height:1.4;">${activeFlashcard.back}</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="progress-container"><div class="progress-fill" style="width:${c.progress}%;background:${c.color}"></div></div>
+                            <button class="btn btn-secondary btn-sm" onclick="changeDashboardFlashcard(); event.stopPropagation();">
+                                Autre matière 🔄
+                            </button>
                         </div>
-                    `).join('')}
+                        
+                        <div style="background:rgba(0,0,0,0.01); border:1px solid var(--border-color); border-radius:var(--border-radius-md); padding:16px; display:flex; flex-direction:column; justify-content:space-between;" id="mini-quiz-box">
+                            ${renderMiniQuizWidget()}
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Right Column -->
-            <div>
-                <!-- Badges -->
-                <div class="card" style="margin-bottom:24px">
-                    <div class="card-title"><i data-lucide="award" style="width:20px;height:20px;color:var(--color-warning)"></i> Mes Badges</div>
-                    <div class="badges-panel-list">
-                        ${[
-            { icon: 'star', name: 'Première étoile', locked: false },
-            { icon: 'zap', name: 'Série de 5', locked: false },
-            { icon: 'flame', name: 'En feu !', locked: false },
-            { icon: 'trophy', name: 'Champion', locked: true },
-            { icon: 'crown', name: 'Expert', locked: true },
-            { icon: 'gem', name: 'Diamant', locked: true }
-        ].map(b => `
-                            <div class="badge-item-display ${b.locked ? 'locked' : ''}">
-                                <div class="badge-icon-shield"><i data-lucide="${b.icon}" style="width:20px;height:20px"></i></div>
-                                <span class="badge-name">${b.name}</span>
+                <div class="card">
+                    <div class="card-title">
+                        <i data-lucide="trophy" style="width:22px;height:22px;color:var(--color-warning);"></i>
+                        <span>Mur des Trophées</span>
+                    </div>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
+                        Gagne des badges pour débloquer des accessoires d'avatar.
+                    </p>
+                    
+                    <div class="trophy-badge-grid">
+                        ${achievements.map(a => `
+                            <div class="trophy-badge-item ${a.unlocked ? 'unlocked' : ''}" title="${a.desc}">
+                                <div style="width:48px; height:48px; border-radius:50%; background:${a.unlocked ? 'var(--color-warning-light)' : 'rgba(0,0,0,0.05)'}; color:${a.unlocked ? 'var(--color-warning)' : 'var(--text-muted)'}; display:flex; align-items:center; justify-content:center; border:2px solid ${a.unlocked ? 'var(--color-warning)' : 'var(--border-color)'}; margin-bottom:6px;">
+                                    <i data-lucide="${a.unlocked ? a.icon : 'lock'}" style="width:24px; height:24px;"></i>
+                                </div>
+                                <span style="font-size:0.75rem; font-weight:800;">${a.title}</span>
                             </div>
                         `).join('')}
                     </div>
                 </div>
 
-                <!-- Quick Actions -->
-                <div class="card">
-                    <div class="card-title"><i data-lucide="zap" style="width:20px;height:20px;color:var(--color-primary)"></i> Actions rapides</div>
-                    <div style="display:flex;flex-direction:column;gap:10px">
-                        <button class="btn btn-secondary" onclick="navigateTo('ia-assistant')" style="width:100%;justify-content:flex-start"><i data-lucide="bot" style="width:18px;height:18px"></i> Poser une question à l'IA</button>
-                        <button class="btn btn-secondary" onclick="navigateTo('bienetre')" style="width:100%;justify-content:flex-start"><i data-lucide="heart" style="width:18px;height:18px"></i> Exercice de respiration</button>
-                        <button class="btn btn-secondary" onclick="navigateTo('whiteboard')" style="width:100%;justify-content:flex-start"><i data-lucide="pen-tool" style="width:18px;height:18px"></i> Ouvrir le tableau blanc</button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:24px;">
+                
+                <div class="card" style="position:relative; overflow:hidden;">
+                    <div class="card-title">
+                        <i data-lucide="user" style="width:22px;height:22px;color:var(--color-primary);"></i>
+                        <span>Fiche de Personnage</span>
+                    </div>
+                    
+                    <div style="display:flex; justify-content:space-around; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px;">
+                        <div style="width:110px; height:110px;">
+                            ${renderAvatarSVG(APP.avatar, APP.mood, 110)}
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <button class="btn btn-primary btn-sm" onclick="openAvatarCreator()">
+                                <i data-lucide="palette" style="width:14px;height:14px"></i> Éditeur d'Avatar
+                            </button>
+                            
+                            <div style="display:flex; gap:6px; justify-content: center;">
+                                ${['😢', '😐', '😄'].map((emoji, i) => {
+        const moodIdx = i * 2;
+        const isActive = APP.mood === moodIdx;
+        return `
+                                        <button class="icon-btn ${isActive ? 'active' : ''}" style="width:32px; height:32px; font-size:1.1rem; padding:0; display:flex; align-items:center; justify-content:center;" onclick="setMood(${moodIdx})" title="Changer d'humeur">
+                                            ${emoji}
+                                        </button>
+                                    `;
+    }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="rpg-stats-grid">
+                        ${statsList.map(stat => {
+        const val = APP.rpgStats[stat.key] || 0;
+        const r = 34;
+        const circ = 2 * Math.PI * r;
+        const strokeOffset = circ - (circ * val / 100);
+
+        return `
+                                <div class="rpg-stat-card">
+                                    <svg class="stat-circle-svg" width="80" height="80">
+                                        <circle class="stat-circle-bg" cx="40" cy="40" r="${r}" />
+                                        <circle class="stat-circle-val" cx="40" cy="40" r="${r}" 
+                                                stroke="${stat.color}" 
+                                                stroke-dasharray="${circ}" 
+                                                stroke-dashoffset="${strokeOffset}" />
+                                        <text x="50%" y="55%" text-anchor="middle" font-weight="800" font-size="12" fill="var(--text-primary)" transform="rotate(90 40 40)">${val}%</text>
+                                    </svg>
+                                    <div class="stat-label-rpg" style="color:${stat.color}">${stat.name}</div>
+                                </div>
+                            `;
+    }).join('')}
                     </div>
                 </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i data-lucide="shopping-bag" style="width:22px;height:22px;color:var(--color-primary);"></i>
+                        <span>Boutique d'Avatar</span>
+                    </div>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
+                        Achète des accessoires exclusifs pour ton avatar avec tes pièces d'or !
+                    </p>
+                    
+                    <div class="shop-grid">
+                        ${shopItems.map(item => {
+        const isOwned = APP.shopBoughtAccessories?.includes(item.id) || APP.unlockedAccessories?.includes(item.id);
+
+        return `
+                                <div class="shop-item-card">
+                                    <span style="font-size:1.6rem; margin-bottom:4px;">${item.name.split(' ')[0]}</span>
+                                    <span style="font-size:0.75rem; font-weight:700; margin-bottom:6px;">${item.name.substring(item.name.indexOf(' ') + 1)}</span>
+                                    <div class="shop-item-price">
+                                        <span>🪙</span>
+                                        <span>${item.price}</span>
+                                    </div>
+                                    ${isOwned ? `
+                                        <button class="btn btn-secondary btn-sm" style="width:100%" disabled>Acquis</button>
+                                    ` : `
+                                        <button class="btn btn-primary btn-sm" style="width:100%" onclick="buyAccessory('${item.id}', ${item.price})">Acheter</button>
+                                    `}
+                                </div>
+                            `;
+    }).join('')}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <i data-lucide="users" style="width:22px;height:22px;color:var(--color-primary);"></i>
+                        <span>Classement de la semaine</span>
+                    </div>
+                    <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
+                        Classement hebdomadaire bienveillant basé sur ta progression en XP.
+                    </p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        ${leaderboard.map((u, idx) => {
+        const isUser = u.isUser || false;
+        const medals = ['🥇', '🥈', '🥉'];
+        const rankIcon = medals[idx] || `${idx + 1}.`;
+
+        return `
+                                <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; border-radius:12px; border:${isUser ? '2px solid var(--color-primary)' : '1px solid transparent'}; background:${isUser ? 'var(--color-primary-light)' : 'rgba(0,0,0,0.01)'}; font-weight:${isUser ? 800 : 500};">
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <span style="font-size:1.1rem; width:24px; text-align:center;">${rankIcon}</span>
+                                        <div style="width:32px; height:32px;">
+                                            ${renderAvatarSVG(u.avatar || { skin: 'light', top: 'shortWaved', hairColor: 'brown', clothing: 'hoodie', clothingColor: 'blue02', accessories: 'none', eyes: 'default', eyebrows: 'defaultNatural', mouth: 'default' }, null, 32)}
+                                        </div>
+                                        <span style="font-size:0.9rem;">${u.name}</span>
+                                    </div>
+                                    <span style="color:var(--color-primary); font-weight:800; font-size:0.9rem;">${u.xp} XP</span>
+                                </div>
+                            `;
+    }).join('')}
+                    </div>
+                </div>
+
             </div>
+            
         </div>
     </div>
     `;
@@ -687,7 +969,14 @@ function renderStudentDashboard() {
 function setMood(index) {
     APP.mood = index;
     saveState();
-    if (index >= 3) launchConfetti();
+    if (index >= 3) {
+        launchConfetti();
+        playRetroSound('success');
+    } else if (index === 0) {
+        playRetroSound('error');
+    } else {
+        playRetroSound('click');
+    }
     showToast('Humeur enregistrée ! Merci 💙', 'success');
     renderApp();
 }
@@ -960,6 +1249,11 @@ function selectSubject(subjectName) {
     quizIndex = 0;
     quizScore = 0;
     quizAnswered = false;
+
+    if (APP.role === 'student') {
+        checkExplorateurAchievement();
+    }
+
     renderApp();
 }
 
@@ -968,6 +1262,10 @@ function previewFiche(ficheId) {
     const fiche = subject.fiches.find(f => f.id === ficheId);
     if (fiche) {
         activePreviewFiche = fiche;
+        if (APP.role === 'student') {
+            gainXP(15, "Fiche consultée");
+            updateRPGStat('INT', 10);
+        }
         renderApp();
     }
 }
@@ -1040,9 +1338,22 @@ function answerQuiz(index) {
     if (index === correct) {
         quizScore++;
         showToast('Bonne réponse ! 🎯', 'success');
+        if (APP.role === 'student') {
+            gainXP(15);
+            gainCoins(5);
+            updateRPGStat('FOCUS', 8);
+        }
     } else {
         options[index].classList.add('incorrect');
         showToast('Pas tout à fait...', 'warning');
+        if (APP.role === 'student') {
+            playRetroSound('error');
+            const quizArea = document.getElementById('quiz-area');
+            if (quizArea) {
+                quizArea.classList.add('shake-error');
+                setTimeout(() => quizArea.classList.remove('shake-error'), 500);
+            }
+        }
     }
 
     // Afficher l'explication
@@ -1069,12 +1380,31 @@ function nextQuizQuestion() {
     quizAnswered = false;
     const quizArea = document.getElementById('quiz-area');
     if (quizArea) {
-        quizArea.innerHTML = renderQuiz();
-        lucide.createIcons({ nodes: [quizArea] });
-
         const currentSubject = APP.activeSubject || 'Mathématiques';
         const activeQuizData = COURSES_DATA[currentSubject]?.quiz || [];
-        if (quizIndex >= activeQuizData.length && quizScore === activeQuizData.length) launchConfetti();
+
+        if (quizIndex >= activeQuizData.length) {
+            quizArea.innerHTML = renderQuiz();
+            lucide.createIcons({ nodes: [quizArea] });
+
+            if (quizScore === activeQuizData.length) {
+                launchConfetti();
+                if (APP.role === 'student') {
+                    gainXP(50, "Quiz sans faute !");
+                    gainCoins(20);
+                    unlockAchievement('math-quiz-master', 'As des Maths', 'Obtenir un score parfait à un quiz de mathématiques');
+
+                    APP.completedQuests = APP.completedQuests || [];
+                    if (currentSubject === 'Mathématiques' && !APP.completedQuests.includes('quest-math')) {
+                        APP.completedQuests.push('quest-math');
+                        saveState();
+                    }
+                }
+            }
+        } else {
+            quizArea.innerHTML = renderQuiz();
+            lucide.createIcons({ nodes: [quizArea] });
+        }
     }
 }
 
@@ -1364,7 +1694,7 @@ function selectStress(level, btn) {
     if (result) result.innerHTML = `<p style="margin-top:16px;padding:16px;background:var(--bg-primary);border-radius:var(--border-radius-md);border-left:4px solid var(--color-primary)">${messages[level]}</p>`;
 }
 
-let breathingInterval = null;
+let breathingCycles = 0;
 function startBreathing() {
     const circle = document.getElementById('breathing-circle');
     const text = document.getElementById('breathing-text');
@@ -1377,8 +1707,22 @@ function startBreathing() {
         text.textContent = 'Start';
         btn.innerHTML = '<i data-lucide="play" style="width:16px;height:16px"></i> Commencer';
         lucide.createIcons({ nodes: [btn] });
+
+        if (APP.role === 'student' && breathingCycles >= 1) {
+            gainXP(20, "Séance de respiration complétée !");
+            updateRPGStat('DEDICATION', 10);
+            unlockAchievement('zen-master', 'Zen Master', 'Compléter l\'exercice de respiration');
+
+            APP.completedQuests = APP.completedQuests || [];
+            if (!APP.completedQuests.includes('quest-zen')) {
+                APP.completedQuests.push('quest-zen');
+                saveState();
+            }
+        }
+        breathingCycles = 0;
         return;
     }
+    breathingCycles = 0;
     zone.classList.add('breathing-active');
     btn.innerHTML = '<i data-lucide="pause" style="width:16px;height:16px"></i> Arrêter';
     lucide.createIcons({ nodes: [btn] });
@@ -1388,6 +1732,9 @@ function startBreathing() {
     breathingInterval = setInterval(() => {
         phase = (phase + 1) % phases.length;
         text.textContent = phases[phase];
+        if (phase === 0) {
+            breathingCycles++;
+        }
     }, 2000);
 }
 
@@ -1409,7 +1756,7 @@ function renderWhiteboardPage() {
                 </div>
                 <div style="display:flex;gap:8px">
                     <button class="btn btn-secondary btn-sm" onclick="clearWhiteboard()"><i data-lucide="trash-2" style="width:14px;height:14px"></i> Effacer</button>
-                    <button class="btn btn-primary btn-sm" onclick="showToast('Dessin sauvegardé !', 'success')"><i data-lucide="save" style="width:14px;height:14px"></i> Sauvegarder</button>
+                    <button class="btn btn-primary btn-sm" onclick="saveWhiteboardDrawing()"><i data-lucide="save" style="width:14px;height:14px"></i> Sauvegarder</button>
                 </div>
             </div>
         </div>
@@ -2815,7 +3162,7 @@ renderAdminDashboard = function () {
 
 // ─── AMÉLIORATION DU PIED DE PAGE LANDING PAGE & GLOBAL ───────────────────────
 const originalRenderLandingPage = renderLandingPage;
-renderRenderLandingPage = function () {
+renderLandingPage = function () {
     const parentHtml = originalRenderLandingPage();
     return `
     ${parentHtml}
@@ -2875,15 +3222,7 @@ renderRenderLandingPage = function () {
     `;
 };
 
-// Override public route selector for rendering public landing footer
-const originalGetPageContentPublic = getPageContent;
-getPageContent = function () {
-    const parentVal = originalGetPageContent();
-    if (APP.role === 'visitor' && APP.currentTab === 'accueil') {
-        return renderRenderLandingPage();
-    }
-    return parentVal;
-};
+// Landing page uses overridden function directly
 
 // ─── MAIN RENDER ─────────────────────────────────────────────────────────────
 
@@ -2893,12 +3232,52 @@ function renderApp() {
     document.documentElement.setAttribute('data-font-size', APP.fontSize);
     document.body.classList.toggle('dyslexic-mode', APP.dyslexicMode);
 
+    // Apply student theme if role is student
+    if (APP.role === 'student') {
+        document.documentElement.setAttribute('data-student-theme', APP.studentTheme || 'college');
+    } else {
+        document.documentElement.removeAttribute('data-student-theme');
+    }
+
     renderSidebar();
     renderHeader();
     renderChatbotWidget();
 
     const main = document.getElementById('main-content');
     main.innerHTML = getPageContent();
+
+    // Inject bottom navbar for mobile student view
+    let bottomNavbar = document.getElementById('student-bottom-nav');
+    if (APP.role === 'student') {
+        if (!bottomNavbar) {
+            bottomNavbar = document.createElement('nav');
+            bottomNavbar.id = 'student-bottom-nav';
+            bottomNavbar.className = 'bottom-navbar';
+            document.getElementById('app').appendChild(bottomNavbar);
+        }
+
+        const mobileTabs = [
+            { id: 'dashboard', label: 'Hub', icon: 'layout-dashboard' },
+            { id: 'cours', label: 'Cours', icon: 'book-open' },
+            { id: 'live', label: 'Lives', icon: 'video' },
+            { id: 'ia-assistant', label: 'William', icon: 'bot' },
+            { id: 'profile-trigger', label: 'Perso', icon: 'user' }
+        ];
+
+        bottomNavbar.innerHTML = mobileTabs.map(t => {
+            const isActive = APP.currentTab === t.id || (t.id === 'profile-trigger' && document.getElementById('avatar-creator-modal'));
+            return `
+                <div class="bottom-nav-item ${isActive ? 'active' : ''}" onclick="playRetroSound('click'); ${t.id === 'profile-trigger' ? 'openAvatarCreator()' : `navigateTo('${t.id}')`}">
+                    <i data-lucide="${t.icon}" style="width:20px;height:20px"></i>
+                    <span>${t.label}</span>
+                </div>
+            `;
+        }).join('');
+
+        bottomNavbar.style.display = '';
+    } else {
+        if (bottomNavbar) bottomNavbar.style.display = 'none';
+    }
 
     // Initialize Lucide icons
     lucide.createIcons();
@@ -2946,6 +3325,805 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+document.head.appendChild(style);
+
+// ==========================================================================
+// SYSTEME DE GAMIFICATION: AVATAR, BOUTIQUE, RPG STATS & SONS RETRO
+// ==========================================================================
+
+let creatorActiveTab = 'skin';
+let tempAvatar = null;
+
+let dashQuizCurrentQuestion = 0;
+let dashQuizScore = 0;
+let dashQuizState = 'not-started'; // 'not-started' | 'playing' | 'answered' | 'finished'
+const DASHBOARD_QUIZ = [
+    { q: "Quel est l'organe principal de la photosynthèse ?", options: ["La racine", "La feuille", "La fleur", "La tige"], correct: 1, explanation: "Les feuilles contiennent la chlorophylle qui capte la lumière." },
+    { q: "Qui a écrit 'Les Misérables' ?", options: ["Émile Zola", "Gustave Flaubert", "Victor Hugo", "Albert Camus"], correct: 2, explanation: "Victor Hugo a publié ce chef-d'œuvre littéraire en 1862." },
+    { q: "Quelle est la valeur de x dans : 2x + 5 = 15 ?", options: ["x = 5", "x = 10", "x = 3", "x = 4"], correct: 0, explanation: "2x = 15 - 5 => 2x = 10 => x = 5." }
+];
+
+function renderMiniQuizWidget() {
+    const qData = DASHBOARD_QUIZ[dashQuizCurrentQuestion];
+    
+    if (dashQuizState === 'not-started') {
+        return `
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; height:100%; min-height:180px; gap:12px;">
+                <div style="font-size:2rem;">⚡</div>
+                <strong style="font-size:1rem; font-weight:800;">Défi Mini-Quiz du Jour</strong>
+                <p style="color:var(--text-secondary); font-size:0.85rem; max-width:240px; margin:0;">
+                    3 questions rapides pour tester tes connaissances générales. 15s par question !
+                </p>
+                <button class="btn btn-primary btn-sm" onclick="startDashQuiz()" style="margin-top:8px;">
+                    Commencer (+XP)
+                </button>
+            </div>
+        `;
+    }
+
+    if (dashQuizState === 'finished') {
+        const isPerfect = dashQuizScore === DASHBOARD_QUIZ.length;
+        return `
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; height:100%; min-height:180px; gap:12px;">
+                <div style="font-size:2rem;">${isPerfect ? '🏆' : '🎉'}</div>
+                <strong style="font-size:1rem; font-weight:800;">Défi Terminé !</strong>
+                <p style="color:var(--text-secondary); font-size:0.85rem; margin:0;">
+                    Tu as obtenu un score de <strong>${dashQuizScore} / ${DASHBOARD_QUIZ.length}</strong>.
+                </p>
+                <div style="font-size:0.75rem; color:var(--color-success); font-weight:800; margin-bottom:4px;">
+                    ${isPerfect ? 'Récompense maximale obtenue ! 💎' : 'Bien joué ! Continue de t\'entraîner.'}
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="resetDashQuiz()">
+                    Recommencer 🔄
+                </button>
+            </div>
+        `;
+    }
+
+    const timerPercent = (dashQuizTimer / 15) * 100;
+
+    return `
+        <div style="display:flex; flex-direction:column; gap:12px; height:100%;">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; font-weight:700; color:var(--text-secondary);">
+                <span>Question ${dashQuizCurrentQuestion + 1}/${DASHBOARD_QUIZ.length}</span>
+                <span style="color:${dashQuizTimer <= 5 ? 'var(--color-danger)' : 'var(--color-primary)'}; font-variant-numeric: tabular-nums;">
+                    ⏱️ ${dashQuizTimer}s
+                </span>
+            </div>
+            
+            <div style="width:100%; height:4px; background:rgba(0,0,0,0.05); border-radius:2px; overflow:hidden;">
+                <div style="width:${timerPercent}%; height:100%; background:${dashQuizTimer <= 5 ? 'var(--color-danger)' : 'var(--color-primary)'}; transition: width 1s linear;"></div>
+            </div>
+
+            <div style="font-weight:700; font-size:0.9rem; margin:4px 0; line-height:1.4;">
+                ${qData.q}
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                ${qData.options.map((opt, idx) => {
+                    let className = 'quiz-option-item';
+                    let extraStyle = 'padding: 8px 12px; font-size: 0.8rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s;';
+                    
+                    if (dashQuizState === 'answered') {
+                        if (idx === qData.correct) {
+                            extraStyle += ' background-color: var(--color-success-light); border-color: var(--color-success); color: var(--color-success); font-weight: 700;';
+                        } else if (idx === dashQuizSelectedOption) {
+                            extraStyle += ' background-color: var(--color-danger-light); border-color: var(--color-danger); color: var(--color-danger);';
+                        } else {
+                            extraStyle += ' opacity: 0.6; cursor: not-allowed;';
+                        }
+                    } else {
+                        extraStyle += ' background-color: var(--bg-card);';
+                    }
+
+                    const clickAction = dashQuizState === 'playing' ? `selectDashQuizOption(${idx})` : '';
+                    return `
+                        <div class="${className}" style="${extraStyle}" onclick="${clickAction}">
+                            ${opt}
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            ${dashQuizState === 'answered' ? `
+                <div style="margin-top:4px; padding:8px 12px; background:var(--color-primary-light); border-left:3px solid var(--color-primary); border-radius:4px; font-size:0.75rem; line-height:1.4;">
+                    <strong>Explication :</strong> ${qData.explanation}
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="nextDashQuizQuestion()" style="margin-top:auto; width:100%;">
+                    ${dashQuizCurrentQuestion + 1 < DASHBOARD_QUIZ.length ? 'Suivant ➡️' : 'Terminer 📊'}
+                </button>
+            ` : ''}
+        </div>
+    `;
+}
+
+function startDashQuiz() {
+    dashQuizCurrentQuestion = 0;
+    dashQuizScore = 0;
+    dashQuizState = 'playing';
+    dashQuizTimer = 15;
+    dashQuizSelectedOption = null;
+    playRetroSound('click');
+    
+    if (dashQuizTimerInterval) clearInterval(dashQuizTimerInterval);
+    dashQuizTimerInterval = setInterval(() => {
+        if (dashQuizState === 'playing') {
+            dashQuizTimer--;
+            if (dashQuizTimer <= 0) {
+                selectDashQuizOption(-1);
+            } else {
+                updateMiniQuizWidgetUI();
+            }
+        }
+    }, 1000);
+
+    renderApp();
+}
+
+function updateMiniQuizWidgetUI() {
+    const miniQuizBox = document.getElementById('mini-quiz-box');
+    if (miniQuizBox) {
+        miniQuizBox.innerHTML = renderMiniQuizWidget();
+    }
+}
+
+function selectDashQuizOption(optionIdx) {
+    if (dashQuizState !== 'playing') return;
+    dashQuizState = 'answered';
+    dashQuizSelectedOption = optionIdx;
+    
+    if (dashQuizTimerInterval) {
+        clearInterval(dashQuizTimerInterval);
+        dashQuizTimerInterval = null;
+    }
+
+    const qData = DASHBOARD_QUIZ[dashQuizCurrentQuestion];
+    const isCorrect = optionIdx === qData.correct;
+
+    if (isCorrect) {
+        dashQuizScore++;
+        playRetroSound('success');
+        showToast('Bonne réponse ! 🎯', 'success');
+        if (APP.role === 'student') {
+            gainXP(10);
+            gainCoins(3);
+            updateRPGStat('FOCUS', 5);
+        }
+    } else {
+        playRetroSound('error');
+        showToast(optionIdx === -1 ? 'Temps écoulé ! ⏱️' : 'Mauvaise réponse...', 'warning');
+        
+        const miniQuizBox = document.getElementById('mini-quiz-box');
+        if (miniQuizBox) {
+            miniQuizBox.classList.add('shake-error');
+            setTimeout(() => miniQuizBox.classList.remove('shake-error'), 500);
+        }
+    }
+
+    renderApp();
+}
+
+function nextDashQuizQuestion() {
+    dashQuizCurrentQuestion++;
+    if (dashQuizCurrentQuestion >= DASHBOARD_QUIZ.length) {
+        dashQuizState = 'finished';
+        playRetroSound('levelUp');
+        launchConfetti();
+        if (APP.role === 'student' && dashQuizScore === DASHBOARD_QUIZ.length) {
+            gainXP(30, "Mini-quiz sans faute !");
+            gainCoins(10);
+        }
+    } else {
+        dashQuizState = 'playing';
+        dashQuizTimer = 15;
+        dashQuizSelectedOption = null;
+        
+        if (dashQuizTimerInterval) clearInterval(dashQuizTimerInterval);
+        dashQuizTimerInterval = setInterval(() => {
+            if (dashQuizState === 'playing') {
+                dashQuizTimer--;
+                if (dashQuizTimer <= 0) {
+                    selectDashQuizOption(-1);
+                } else {
+                    updateMiniQuizWidgetUI();
+                }
+            }
+        }, 1000);
+    }
+    
+    renderApp();
+}
+
+function resetDashQuiz() {
+    dashQuizState = 'not-started';
+    dashQuizCurrentQuestion = 0;
+    dashQuizScore = 0;
+    if (dashQuizTimerInterval) {
+        clearInterval(dashQuizTimerInterval);
+        dashQuizTimerInterval = null;
+    }
+    playRetroSound('click');
+    renderApp();
+}
+
+function renderAvatarSVG(avatar, mood = null, size = 80) {
+    if (!avatar) {
+        // Default placeholder for users who haven't created an avatar yet
+        return Avataaars.create({
+            style: 'circle',
+            skin: 'light',
+            top: 'shortWaved',
+            hairColor: 'brown',
+            clothing: 'hoodie',
+            clothingColor: 'pastelBlue',
+            accessories: 'none',
+            eyes: 'default',
+            eyebrows: 'defaultNatural',
+            mouth: 'default',
+            width: size,
+            height: size
+        });
+    }
+
+    // Map mood to eye and mouth expressions
+    let moodEyes = avatar.eyes || 'default';
+    let moodMouth = avatar.mouth || 'default';
+
+    if (mood !== null && mood !== undefined) {
+        if (mood === 0 || mood === 1) { // Triste / Stressé
+            moodEyes = 'squint';
+            moodMouth = 'sad';
+        } else if (mood === 4) { // Très joyeux
+            moodEyes = 'happy';
+            moodMouth = 'smile';
+        } else if (mood === 2 || mood === 3) { // Neutre / Concentré
+            moodEyes = 'default';
+            moodMouth = 'default';
+        }
+    }
+
+    return Avataaars.create({
+        style: 'circle',
+        skin: avatar.skin || 'light',
+        top: avatar.top || 'shortWaved',
+        hairColor: avatar.hairColor || 'brown',
+        clothing: avatar.clothing || 'hoodie',
+        clothingColor: avatar.clothingColor || 'pastelBlue',
+        accessories: avatar.accessories || 'none',
+        accessoriesColor: avatar.accessoriesColor || 'black',
+        eyes: moodEyes,
+        eyebrows: avatar.eyebrows || 'defaultNatural',
+        mouth: moodMouth,
+        width: size,
+        height: size
+    });
+}
+
+function openAvatarCreator() {
+    if (!APP.avatar) {
+        APP.avatar = {
+            skin: 'light',
+            top: 'shortWaved',
+            hairColor: 'brown',
+            clothing: 'hoodie',
+            clothingColor: 'pastelBlue',
+            accessories: 'none',
+            eyes: 'default',
+            eyebrows: 'defaultNatural',
+            mouth: 'default'
+        };
+    }
+    tempAvatar = JSON.parse(JSON.stringify(APP.avatar));
+
+    let overlay = document.getElementById('avatar-creator-modal');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'avatar-creator-modal';
+        overlay.className = 'avatar-creator-overlay';
+        document.body.appendChild(overlay);
+    }
+    renderAvatarCreatorContent();
+}
+
+function renderAvatarCreatorContent() {
+    const overlay = document.getElementById('avatar-creator-modal');
+    if (!overlay) return;
+
+    // AvataaarsJs option values
+    const skinOptions = [
+        { name: 'Clair', val: 'pale' },
+        { name: 'Pêche', val: 'light' },
+        { name: 'Doré', val: 'yellow' },
+        { name: 'Brun', val: 'brown' },
+        { name: 'Chocolat', val: 'darkBrown' },
+        { name: 'Ébène', val: 'black' }
+    ];
+    const topOptions = [
+        { name: '✂️ Court', val: 'shortWaved' },
+        { name: '💇 Plat', val: 'shortFlat' },
+        { name: '🌊 Ondulé', val: 'shortDreads01' },
+        { name: '💁 Lisse', val: 'straight01' },
+        { name: '🌀 Bouclés', val: 'curly' },
+        { name: '😤 Ébouriffé', val: 'frizzle' },
+        { name: '👱 César', val: 'theCaesar' },
+        { name: '🧑‍🎤 Dreads', val: 'dreads01' },
+        { name: '🦲 Chauve', val: 'noHair' },
+        { name: '🧢 Bonnet', val: 'winterHat02' },
+        { name: '🎩 Chapeau', val: 'hat' },
+        { name: '🧕 Hijab', val: 'hijab' },
+        { name: '🧣 Turban', val: 'turban' }
+    ];
+    const hairColorOptions = [
+        { name: 'Brun', val: 'brown' },
+        { name: 'Noir', val: 'black' },
+        { name: 'Blond', val: 'blondeGolden' },
+        { name: 'Roux', val: 'red' },
+        { name: 'Platine', val: 'platinum' },
+        { name: 'Auburn', val: 'auburn' },
+        { name: 'Gris', val: 'silverGray' },
+        { name: 'Rose', val: 'pastelPink' }
+    ];
+    const eyesOptions = [
+        { name: '👀 Normal', val: 'default' },
+        { name: '😊 Content', val: 'happy' },
+        { name: '🤔 Surpris', val: 'surprised' },
+        { name: '😐 Fatigué', val: 'squint' },
+        { name: '😏 De côté', val: 'side' },
+        { name: '😉 Clin d\'œil', val: 'winkWacky' },
+        { name: '🤩 Étoiles', val: 'hearts' },
+        { name: '😌 Fermés', val: 'close' }
+    ];
+    const eyebrowsOptions = [
+        { name: 'Naturel', val: 'defaultNatural' },
+        { name: 'Plat', val: 'flatNatural' },
+        { name: 'Surpris', val: 'raisedExcitedNatural' },
+        { name: 'En colère', val: 'angryNatural' },
+        { name: 'Triste', val: 'sadConcernedNatural' },
+        { name: 'Uni', val: 'unibrowNatural' }
+    ];
+    const mouthOptions = [
+        { name: '😐 Normal', val: 'default' },
+        { name: '😊 Sourire', val: 'smile' },
+        { name: '😄 Rire', val: 'twinkle' },
+        { name: '😮 Surpris', val: 'disbelief' },
+        { name: '😕 Triste', val: 'sad' },
+        { name: '😎 Sérieux', val: 'serious' },
+        { name: '👅 Langue', val: 'tongue' },
+        { name: '😬 Gêné', val: 'grimace' }
+    ];
+    const clothingOptions = [
+        { name: '👕 T-Shirt', val: 'shirtCrewNeck' },
+        { name: '🧥 Hoodie', val: 'hoodie' },
+        { name: '🔵 Col-V', val: 'shirtVNeck' },
+        { name: '👔 Blazer', val: 'blazerAndSweater' },
+        { name: '🎨 Imprimé', val: 'graphicShirt' },
+        { name: '🎅 Pull', val: 'collarAndSweater' },
+        { name: '👚 Épaule', val: 'overall' }
+    ];
+    const clothingColorOptions = [
+        { name: 'Bleu', val: 'blue02' },
+        { name: 'Rose', val: 'pink' },
+        { name: 'Menthe', val: 'pastelGreen' },
+        { name: 'Rouge', val: 'red' },
+        { name: 'Noir', val: 'black' },
+        { name: 'Gris', val: 'gray02' },
+        { name: 'Blanc', val: 'white' },
+        { name: 'Lavande', val: 'pastelBlue' }
+    ];
+
+    const allAccessories = [
+        { id: 'none', name: '❌ Aucun' },
+        { id: 'prescription01', name: '👓 Lunettes' },
+        { id: 'prescription02', name: '🤓 Lunettes Pro' },
+        { id: 'round', name: '⭕ Rondes' },
+        { id: 'sunglasses', name: '🕶️ Soleil' },
+        { id: 'wayfarers', name: '😎 Wayfarers' },
+        { id: 'kurt', name: '🤪 Kurt' },
+        { id: 'eyepatch', name: '🏴‍☠️ Cache-œil' }
+    ];
+
+    const availableAccs = allAccessories.filter(a =>
+        a.id === 'none' ||
+        APP.unlockedAccessories.includes(a.id) ||
+        APP.shopBoughtAccessories?.includes(a.id)
+    );
+
+    let tabContent = '';
+    if (creatorActiveTab === 'skin') {
+        tabContent = `
+            <div class="creator-section-label">Couleur de peau</div>
+            <div class="creator-grid">
+                ${skinOptions.map(s => `
+                    <div class="creator-item-option ${tempAvatar.skin === s.val ? 'active' : ''}" onclick="updateTempAvatar('skin', '${s.val}')">
+                        ${s.name}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else if (creatorActiveTab === 'hair') {
+        tabContent = `
+            <div class="creator-section-label">Coiffure</div>
+            <div class="creator-grid">
+                ${topOptions.map(h => `
+                    <div class="creator-item-option ${tempAvatar.top === h.val ? 'active' : ''}" onclick="updateTempAvatar('top', '${h.val}')" style="font-weight:700">
+                        ${h.name}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="creator-section-label" style="margin-top:16px">Couleur des cheveux</div>
+            <div class="creator-grid" style="grid-template-columns: repeat(4, 1fr); margin-top:8px">
+                ${hairColorOptions.map(c => `
+                    <div class="creator-item-option ${tempAvatar.hairColor === c.val ? 'active' : ''}" onclick="updateTempAvatar('hairColor', '${c.val}')">
+                        ${c.name}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else if (creatorActiveTab === 'face') {
+        tabContent = `
+            <div class="creator-section-label">Yeux</div>
+            <div class="creator-grid">
+                ${eyesOptions.map(e => `
+                    <div class="creator-item-option ${tempAvatar.eyes === e.val ? 'active' : ''}" onclick="updateTempAvatar('eyes', '${e.val}')">
+                        ${e.name}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="creator-section-label" style="margin-top:16px">Sourcils</div>
+            <div class="creator-grid" style="grid-template-columns: repeat(3, 1fr)">
+                ${eyebrowsOptions.map(b => `
+                    <div class="creator-item-option ${tempAvatar.eyebrows === b.val ? 'active' : ''}" onclick="updateTempAvatar('eyebrows', '${b.val}')">
+                        ${b.name}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="creator-section-label" style="margin-top:16px">Bouche</div>
+            <div class="creator-grid">
+                ${mouthOptions.map(m => `
+                    <div class="creator-item-option ${tempAvatar.mouth === m.val ? 'active' : ''}" onclick="updateTempAvatar('mouth', '${m.val}')">
+                        ${m.name}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else if (creatorActiveTab === 'clothes') {
+        tabContent = `
+            <div class="creator-section-label">Vêtement</div>
+            <div class="creator-grid">
+                ${clothingOptions.map(c => `
+                    <div class="creator-item-option ${tempAvatar.clothing === c.val ? 'active' : ''}" onclick="updateTempAvatar('clothing', '${c.val}')">
+                        ${c.name}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="creator-section-label" style="margin-top:16px">Couleur</div>
+            <div class="creator-grid" style="grid-template-columns: repeat(4, 1fr)">
+                ${clothingColorOptions.map(c => `
+                    <div class="creator-item-option ${tempAvatar.clothingColor === c.val ? 'active' : ''}" onclick="updateTempAvatar('clothingColor', '${c.val}')">
+                        ${c.name}
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else if (creatorActiveTab === 'accessories') {
+        tabContent = `
+            <div class="creator-section-label">Accessoires débloqués</div>
+            <div style="display:flex; flex-direction:column; gap:10px">
+                ${availableAccs.map(a => {
+            const isEquipped = tempAvatar.accessories === a.id;
+            return `
+                        <button class="btn ${isEquipped ? 'btn-primary' : 'btn-secondary'}" style="justify-content:flex-start" onclick="updateTempAvatar('accessories', '${a.id}')">
+                            <i data-lucide="${isEquipped ? 'check-circle' : 'circle'}" style="width:18px;height:18px"></i> ${a.name}
+                        </button>
+                    `;
+        }).join('')}
+            </div>
+        `;
+    } else if (creatorActiveTab === 'theme') {
+        tabContent = `
+            <div style="display:flex; flex-direction:column; gap:16px">
+                <button class="btn ${APP.studentTheme === 'college' ? 'btn-primary' : 'btn-secondary'}" onclick="setStudentTheme('college')">
+                    🎒 Mode Aventurier (Collège)
+                </button>
+                <button class="btn ${APP.studentTheme === 'lycee' ? 'btn-primary' : 'btn-secondary'}" onclick="setStudentTheme('lycee')">
+                    🎮 Mode Pro Gamer (Lycée)
+                </button>
+            </div>
+        `;
+    }
+
+    overlay.innerHTML = `
+        <div class="avatar-creator-panel card">
+            <div class="creator-preview-section">
+                <h2 style="font-weight:800;margin-bottom:16px;text-align:center">Mon Avatar</h2>
+                <div style="width:160px;height:160px">
+                    ${renderAvatarSVG(tempAvatar, APP.mood, 160)}
+                </div>
+                <div style="margin-top:20px; font-size:0.8rem; color:var(--text-secondary); text-align:center">
+                    ${APP.username} · Niveau ${APP.level}
+                </div>
+            </div>
+            
+            <div style="display:flex;flex-direction:column">
+                <div class="creator-options-tabs">
+                    <button class="creator-tab ${creatorActiveTab === 'skin' ? 'active' : ''}" onclick="setCreatorTab('skin')">Peau</button>
+                    <button class="creator-tab ${creatorActiveTab === 'hair' ? 'active' : ''}" onclick="setCreatorTab('hair')">Cheveux</button>
+                    <button class="creator-tab ${creatorActiveTab === 'face' ? 'active' : ''}" onclick="setCreatorTab('face')">Visage</button>
+                    <button class="creator-tab ${creatorActiveTab === 'clothes' ? 'active' : ''}" onclick="setCreatorTab('clothes')">Style</button>
+                    <button class="creator-tab ${creatorActiveTab === 'accessories' ? 'active' : ''}" onclick="setCreatorTab('accessories')">Items</button>
+                    <button class="creator-tab ${creatorActiveTab === 'theme' ? 'active' : ''}" onclick="setCreatorTab('theme')">Vibe</button>
+                </div>
+                
+                <div style="flex-grow:1;margin-bottom:24px;max-height:300px;overflow-y:auto">
+                    ${tabContent}
+                </div>
+                
+                <div style="display:flex;gap:12px;justify-content:flex-end">
+                    <button class="btn btn-secondary" onclick="closeAvatarCreator()">Annuler</button>
+                    <button class="btn btn-primary" onclick="saveAvatar()">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    lucide.createIcons({ nodes: [overlay] });
+}
+
+function setCreatorTab(tab) {
+    creatorActiveTab = tab;
+    renderAvatarCreatorContent();
+}
+
+function updateTempAvatar(key, value) {
+    tempAvatar[key] = value;
+    renderAvatarCreatorContent();
+}
+
+function setStudentTheme(theme) {
+    APP.studentTheme = theme;
+    saveState();
+    document.documentElement.setAttribute('data-student-theme', theme);
+    playRetroSound('click');
+    renderAvatarCreatorContent();
+}
+
+function saveAvatar() {
+    APP.avatar = tempAvatar;
+    saveState();
+    closeAvatarCreator();
+    playRetroSound('levelUp');
+    launchConfetti();
+    showToast("Avatar mis à jour ! 🌟", "success");
+    renderApp();
+}
+
+function closeAvatarCreator() {
+    const overlay = document.getElementById('avatar-creator-modal');
+    if (overlay) overlay.remove();
+}
+
+function playRetroSound(type) {
+    if (APP.soundMuted) return;
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        const now = ctx.currentTime;
+
+        if (type === 'click') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.05);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.05);
+        } else if (type === 'success') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now); // C5
+            osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+            osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+            osc.start(now);
+            osc.stop(now + 0.3);
+        } else if (type === 'levelUp') {
+            osc.type = 'square';
+            const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50]; // C4, E4, G4, C5, E5, G5, C6
+            notes.forEach((freq, idx) => {
+                osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+            });
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.setValueAtTime(0.08, now + 0.3);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+
+            osc.start(now);
+            osc.stop(now + 0.45);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(100, now + 0.22);
+
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+
+            osc.start(now);
+            osc.stop(now + 0.22);
+        }
+    } catch (e) {
+        console.warn("AudioContext failed", e);
+    }
+}
+
+function toggleMuteSound() {
+    APP.soundMuted = !APP.soundMuted;
+    saveState();
+    playRetroSound('click');
+    renderApp();
+    showToast(APP.soundMuted ? "Sons coupés 🔇" : "Sons activés 🔊", "primary");
+}
+
+function gainXP(amount, message = '') {
+    if (APP.role !== 'student') return;
+    APP.xp = (APP.xp || 0) + amount;
+
+    let leveledUp = false;
+    while (APP.xp >= 100) {
+        APP.xp -= 100;
+        APP.level = (APP.level || 1) + 1;
+        leveledUp = true;
+    }
+
+    saveState();
+
+    if (leveledUp) {
+        playRetroSound('levelUp');
+        launchConfetti();
+        showToast(`🎉 LEVEL UP ! Tu es niveau ${APP.level} !`, 'success');
+    } else if (message) {
+        showToast(`${message} (+${amount} XP)`, 'success');
+        playRetroSound('success');
+    }
+}
+
+function gainCoins(amount) {
+    if (APP.role !== 'student') return;
+    APP.coins = (APP.coins || 0) + amount;
+    saveState();
+}
+
+function updateRPGStat(statName, amount) {
+    if (APP.role !== 'student') return;
+    APP.rpgStats = APP.rpgStats || { INT: 50, FOCUS: 45, DEDICATION: 60, CREATIVE: 30 };
+    APP.rpgStats[statName] = Math.min(100, (APP.rpgStats[statName] || 0) + amount);
+    saveState();
+}
+
+function unlockAchievement(id, title, description) {
+    if (APP.role !== 'student') return;
+    APP.unlockedBadges = APP.unlockedBadges || [];
+    if (APP.unlockedBadges.includes(id)) return;
+
+    APP.unlockedBadges.push(id);
+
+    const accessoryMap = {
+        'first-avatar': 'prescription01',
+        'math-quiz-master': 'round',
+        'streak-3': 'sunglasses',
+        'explorateur': 'wayfarers',
+        'zen-master': 'kurt'
+    };
+    const accToUnlock = accessoryMap[id];
+    if (accToUnlock && !APP.unlockedAccessories.includes(accToUnlock)) {
+        APP.unlockedAccessories.push(accToUnlock);
+    }
+
+    saveState();
+    playRetroSound('levelUp');
+    launchConfetti();
+    showToast(`🏆 BADGE DÉBLOQUÉ : ${title} !`, 'success');
+}
+
+function getLeaderboardData() {
+    const userXP = (APP.level - 1) * 100 + APP.xp;
+    const list = [
+        { name: 'Léa Martin', xp: 450, avatar: { skin: 'pale', top: 'straight01', hairColor: 'blondeGolden', clothing: 'hoodie', clothingColor: 'pink', accessories: 'prescription01', eyes: 'happy', eyebrows: 'defaultNatural', mouth: 'smile' } },
+        { name: 'Thomas Dupont', xp: 320, avatar: { skin: 'light', top: 'shortFlat', hairColor: 'black', clothing: 'shirtCrewNeck', clothingColor: 'blue02', accessories: 'none', eyes: 'default', eyebrows: 'defaultNatural', mouth: 'default' } },
+        { name: 'Inès Boucher', xp: 210, avatar: { skin: 'pale', top: 'curly', hairColor: 'brown', clothing: 'blazerAndSweater', clothingColor: 'pastelGreen', accessories: 'round', eyes: 'default', eyebrows: 'flatNatural', mouth: 'twinkle' } },
+        { name: 'Lucas Moreau', xp: 120, avatar: { skin: 'brown', top: 'theCaesar', hairColor: 'red', clothing: 'graphicShirt', clothingColor: 'red', accessories: 'sunglasses', eyes: 'side', eyebrows: 'angryNatural', mouth: 'serious' } }
+    ];
+
+    list.push({
+        name: APP.username + ' (Toi)',
+        xp: userXP,
+        avatar: APP.avatar,
+        isUser: true
+    });
+
+    list.sort((a, b) => b.xp - a.xp);
+    return list;
+}
+
+function claimQuestReward(questId, xpReward, coinReward) {
+    APP.claimedQuests = APP.claimedQuests || [];
+    if (APP.claimedQuests.includes(questId)) return;
+
+    APP.claimedQuests.push(questId);
+    gainXP(xpReward);
+    gainCoins(coinReward);
+    saveState();
+    renderApp();
+}
+
+function flipFlashcard(el) {
+    el.classList.toggle('flipped');
+    playRetroSound('click');
+}
+
+const FLASHCARD_SUBJECTS = ['Mathématiques', 'Français', 'SVT', 'Anglais'];
+function changeDashboardFlashcard() {
+    let currIdx = FLASHCARD_SUBJECTS.indexOf(APP.activeSubject || 'Mathématiques');
+    let nextIdx = (currIdx + 1) % FLASHCARD_SUBJECTS.length;
+    APP.activeSubject = FLASHCARD_SUBJECTS[nextIdx];
+    saveState();
+    playRetroSound('click');
+    renderApp();
+}
+
+function saveWhiteboardDrawing() {
+    showToast('Dessin sauvegardé ! 🎨', 'success');
+    if (APP.role === 'student') {
+        gainXP(20, "Schéma enregistré !");
+        updateRPGStat('CREATIVE', 15);
+        unlockAchievement('whiteboard-artist', 'Artiste', 'Sauvegarder un dessin sur le Tableau Blanc');
+
+        APP.completedQuests = APP.completedQuests || [];
+        if (!APP.completedQuests.includes('quest-whiteboard')) {
+            APP.completedQuests.push('quest-whiteboard');
+            saveState();
+        }
+    }
+}
+
+function buyAccessory(id, price) {
+    APP.shopBoughtAccessories = APP.shopBoughtAccessories || [];
+    if (APP.shopBoughtAccessories.includes(id)) {
+        showToast("Tu possèdes déjà cet accessoire !", "warning");
+        return;
+    }
+    if ((APP.coins || 0) < price) {
+        showToast("Pas assez de pièces ! 😢", "danger");
+        playRetroSound('error');
+        return;
+    }
+    APP.coins -= price;
+    APP.shopBoughtAccessories.push(id);
+    saveState();
+    playRetroSound('levelUp');
+    launchConfetti();
+    showToast("Achat réussi ! Équipe-le dans l'éditeur.", "success");
+    renderApp();
+}
+
+function checkExplorateurAchievement() {
+    APP.exploredSubjects = APP.exploredSubjects || [];
+    if (!APP.exploredSubjects.includes(APP.activeSubject)) {
+        APP.exploredSubjects.push(APP.activeSubject);
+        saveState();
+        if (APP.exploredSubjects.length >= 3) {
+            unlockAchievement('explorateur', 'Explorateur', 'Consulter au moins 3 matières différentes');
+        }
+    }
+}
 
 // ─── BOOT ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
